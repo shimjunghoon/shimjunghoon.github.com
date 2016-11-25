@@ -1,0 +1,22 @@
+{
+  "name": "voxel-tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "painterly-textures": "0.0.3",
+    "voxel": "^0.5.0",
+    "voxel-engine": "^0.20.2",
+    "voxel-fly": "^0.1.2",
+    "voxel-mesher": "^0.14.4",
+    "voxel-player": "^0.1.0",
+    "voxel-plugins": "^0.5.0",
+    "voxel-tetris": "0.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
