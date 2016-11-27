@@ -1,33 +1,68 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (__dirname){
 var containter = document.querySelector('#containter')
 var createGame = require('voxel-engine')
-var painterlyPath = require('painterly-textures')(__dirname)
-
+var fly = require('voxel-fly')
+//var createPlugins = require('voxel-plugins');
+//var plugins = createPlugins(game, {require:require});
+//var mesher = game.plugins.get('voxel-mesher');
 var game = createGame({
-	texturePath: painterlyPath,
+	texturePath: '/textures/',
+	materials: ['black', 'frame', 'red', 'blue', 'green', 'yellow'],
 	generate: function(x, y, z){
-		return y === 1 ? 1 : 0 || y < 1 && y > -20 ? 2 : 0
+		if((x === -5 || x === 10) || (z === -5 || z === 20) || y === 0) return 2;
+		if((x === -1 || x === 6) && (y >= 1 && y <= 20) && z === 3) return 1;
+		return y === 1 && x >= 0 &&  x <= 5 && z === 3 ? 1 : 0
 	},
-	worldOrigin: [0, 0, 0]
+	worldOrigin: [0, 0, 0],
 })
 
 window.game = game
-game.appendTo(containter)
+game.appendTo(container)
 
 var createPlayer = require('voxel-player')(game)
 var player = createPlayer('skin.png')
 
-player.position.set(10, 10, -10)
+player.position.set(4, 1, 19)
 player.possess()
 
+
+// var mesh = mesher.createVoxelMesh(voxels, voxelSideTextureIDs, voxelSideTextureSizes, position, pad)
+var makeFly = fly(game)
+var target = game.controls.target()
+game.flyer = makeFly(target)
+
 window.addEventListener('keydown', function(ev){
+	if(ev.keyCode === '1'.charCodeAt(0)){
+		tetris.command(0)
+	}
+	if(ev.keyCode === '2'.charCodeAt(0)){
+		tetris.command(1)
+	}
+	if(ev.keyCode === '3'.charCodeAt(0)){
+		tetris.command(3)
+	}
+	if(ev.keyCode === '4'.charCodeAt(0)){
+		tetris.command(2)
+	}
+	if(ev.keyCode === '5'.charCodeAt(0)){
+		tetris.command(4)
+	}
 	if(ev.keyCode === 'R'.charCodeAt(0)){
-		player.toggle()
+		tetris.command(5)
 	}
 })
-}).call(this,"/")
-},{"painterly-textures":19,"voxel-engine":30,"voxel-player":41}],2:[function(require,module,exports){
+
+var tetris = require('voxel-tetris')(game)
+
+
+tetris.setDroplocation(3, 20, 3)
+
+
+game.on('tick', function() {
+  if(!tetris.overflag) tetris.tick();
+	else console.log("end");
+});
+},{"voxel-engine":29,"voxel-fly":39,"voxel-player":41,"voxel-tetris":44}],2:[function(require,module,exports){
 module.exports = AABB
 
 var vec3 = require('gl-matrix').vec3
@@ -629,7 +664,7 @@ function valueFromElement(el) {
   return el.value
 }
 
-},{"stream":70}],8:[function(require,module,exports){
+},{"stream":71}],8:[function(require,module,exports){
 module.exports = DOMStream
 
 var Stream = require('stream').Stream
@@ -711,7 +746,7 @@ proto.constructTextPlain = function(data) {
   return [textNode]
 }
 
-},{"stream":70}],9:[function(require,module,exports){
+},{"stream":71}],9:[function(require,module,exports){
 module.exports = dragstream
 
 var Stream = require('stream')
@@ -779,7 +814,7 @@ function dragstream(el) {
   }
 }
 
-},{"domnode-dom":5,"stream":70,"through":26}],10:[function(require,module,exports){
+},{"domnode-dom":5,"stream":71,"through":25}],10:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 
 module.exports = function (elem) {
@@ -891,7 +926,7 @@ Ever.typeOf = (function () {
     };
 })();;
 
-},{"./init.json":11,"./types.json":12,"events":51}],11:[function(require,module,exports){
+},{"./init.json":11,"./types.json":12,"events":52}],11:[function(require,module,exports){
 module.exports={
   "initEvent" : [
     "type",
@@ -1070,7 +1105,7 @@ function shim(el) {
     el.oRequestFullScreen)
 }
 
-},{"events":51}],14:[function(require,module,exports){
+},{"events":52}],14:[function(require,module,exports){
 /**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -4281,7 +4316,7 @@ function usedrag(el) {
   return ee
 }
 
-},{"drag-stream":9,"events":51,"fullscreen":13,"pointer-lock":21,"stream":70}],17:[function(require,module,exports){
+},{"drag-stream":9,"events":52,"fullscreen":13,"pointer-lock":20,"stream":71}],17:[function(require,module,exports){
 var ever = require('ever')
   , vkey = require('vkey')
   , max = Math.max
@@ -4378,7 +4413,7 @@ module.exports = function(el, bindings, state) {
   }
 }
 
-},{"ever":10,"vkey":28}],18:[function(require,module,exports){
+},{"ever":10,"vkey":27}],18:[function(require,module,exports){
 var THREE
 
 module.exports = function(three, image, sizeRatio) {
@@ -4751,16 +4786,6 @@ Skin.prototype.createPlayerObject = function(scene) {
   return playerGroup
 }
 },{}],19:[function(require,module,exports){
-(function (__dirname){
-var path = require('path')
-var texturePath = __dirname + '/textures'
-
-module.exports = function(dir) {
-  return path.relative(dir, texturePath) + '/'
-}
-
-}).call(this,"/node_modules/painterly-textures")
-},{"path":56}],20:[function(require,module,exports){
 module.exports = pin
 
 var pins = {}
@@ -4842,7 +4867,7 @@ function pin(item, every, obj, name) {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = pointer
 
 pointer.available = available
@@ -5006,7 +5031,7 @@ function shim(el) {
     null
 }
 
-},{"events":51,"stream":70}],22:[function(require,module,exports){
+},{"events":52,"stream":71}],21:[function(require,module,exports){
 module.exports = raf
 
 var EE = require('events').EventEmitter
@@ -5053,7 +5078,7 @@ function raf(el) {
 raf.polyfill = _raf
 raf.now = function() { return Date.now() }
 
-},{"events":51}],23:[function(require,module,exports){
+},{"events":52}],22:[function(require,module,exports){
 module.exports = SpatialEventEmitter
 
 var slice = [].slice
@@ -5185,7 +5210,7 @@ function finite(bbox) {
          isFinite(bbox.z1())
 }
 
-},{"./tree":24,"aabb-3d":2}],24:[function(require,module,exports){
+},{"./tree":23,"aabb-3d":2}],23:[function(require,module,exports){
 module.exports = Tree
 
 var aabb = require('aabb-3d')
@@ -5311,7 +5336,7 @@ proto.send = function(event, bbox, args) {
   }
 }
 
-},{"aabb-3d":2}],25:[function(require,module,exports){
+},{"aabb-3d":2}],24:[function(require,module,exports){
 (function (process){
 
 var window = window || {};
@@ -41345,7 +41370,7 @@ if (typeof exports !== 'undefined') {
 }
 
 }).call(this,require('_process'))
-},{"_process":58}],26:[function(require,module,exports){
+},{"_process":59}],25:[function(require,module,exports){
 (function (process){
 var Stream = require('stream')
 
@@ -41447,7 +41472,7 @@ function through (write, end) {
 
 
 }).call(this,require('_process'))
-},{"_process":58,"stream":70}],27:[function(require,module,exports){
+},{"_process":59,"stream":71}],26:[function(require,module,exports){
 /*
  * tic
  * https://github.com/shama/tic
@@ -41494,7 +41519,7 @@ Tic.prototype.tick = function(dt) {
   });
 };
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var ua = typeof window !== 'undefined' ? window.navigator.userAgent : ''
   , isOSX = /OS X/.test(ua)
   , isOpera = /Opera/.test(ua)
@@ -41623,7 +41648,7 @@ for(i = 65; i < 91; ++i) {
 }
 
 // num0-9
-for(i = 96; i < 106; ++i) {
+for(i = 96; i < 107; ++i) {
   output[i] = '<num-'+(i - 96)+'>'
 }
 
@@ -41632,7 +41657,7 @@ for(i = 112; i < 136; ++i) {
   output[i] = 'F'+(i-111)
 }
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = control
 
 var Stream = require('stream').Stream
@@ -41915,7 +41940,7 @@ function clamp(value, to) {
   return isFinite(to) ? max(min(value, to), -to) : value
 }
 
-},{"stream":70}],30:[function(require,module,exports){
+},{"stream":71}],29:[function(require,module,exports){
 (function (process){
 var voxel = require('voxel')
 var voxelMesh = require('voxel-mesh')
@@ -42658,7 +42683,7 @@ Game.prototype.destroy = function() {
 }
 
 }).call(this,require('_process'))
-},{"./lib/detector":31,"./lib/stats":32,"_process":58,"aabb-3d":2,"collide-3d-tilemap":4,"events":51,"gl-matrix":14,"inherits":15,"interact":16,"kb-controls":17,"path":56,"pin-it":20,"raf":22,"spatial-events":23,"three":25,"tic":27,"voxel":34,"voxel-control":29,"voxel-mesh":39,"voxel-physical":40,"voxel-raycast":42,"voxel-region-change":43,"voxel-texture":44,"voxel-view":45}],31:[function(require,module,exports){
+},{"./lib/detector":30,"./lib/stats":31,"_process":59,"aabb-3d":2,"collide-3d-tilemap":4,"events":52,"gl-matrix":14,"inherits":15,"interact":16,"kb-controls":17,"path":57,"pin-it":19,"raf":21,"spatial-events":22,"three":24,"tic":26,"voxel":34,"voxel-control":28,"voxel-mesh":32,"voxel-physical":40,"voxel-raycast":42,"voxel-region-change":43,"voxel-texture":45,"voxel-view":46}],30:[function(require,module,exports){
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mr.doob / http://mrdoob.com/
@@ -42719,7 +42744,7 @@ module.exports = function() {
   };
 }
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -42865,7 +42890,177 @@ var Stats = function () {
 };
 
 module.exports = Stats
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
+var THREE = require('three')
+
+module.exports = function(data, mesher, scaleFactor, three) {
+  return new Mesh(data, mesher, scaleFactor, three)
+}
+
+module.exports.Mesh = Mesh
+
+function Mesh(data, mesher, scaleFactor, three) {
+  this.THREE = three || THREE
+  this.data = data
+  var geometry = this.geometry = new this.THREE.Geometry()
+  this.scale = scaleFactor || new this.THREE.Vector3(10, 10, 10)
+  
+  var result = mesher( data.voxels, data.dims )
+  this.meshed = result
+
+  geometry.vertices.length = 0
+  geometry.faces.length = 0
+
+  for (var i = 0; i < result.vertices.length; ++i) {
+    var q = result.vertices[i]
+    geometry.vertices.push(new this.THREE.Vector3(q[0], q[1], q[2]))
+  } 
+  
+  for (var i = 0; i < result.faces.length; ++i) {
+    geometry.faceVertexUvs[0].push(this.faceVertexUv(i))
+    
+    var q = result.faces[i]
+    if (q.length === 5) {
+      var f = new this.THREE.Face4(q[0], q[1], q[2], q[3])
+      f.color = new this.THREE.Color(q[4])
+      geometry.faces.push(f)
+    } else if (q.length == 4) {
+      var f = new this.THREE.Face3(q[0], q[1], q[2])
+      f.color = new this.THREE.Color(q[3])
+      geometry.faces.push(f)
+    }
+  }
+  
+  geometry.computeFaceNormals()
+
+  // compute vertex colors for ambient occlusion
+  var light = new THREE.Color(0xffffff)
+  var shadow = new THREE.Color(0x505050)
+  for (var i = 0; i < geometry.faces.length; ++i) {
+    var face = geometry.faces[i]
+    // facing up
+    if (face.normal.y === 1)       face.vertexColors = [light, light, light, light]
+    // facing down
+    else if (face.normal.y === -1) face.vertexColors = [shadow, shadow, shadow, shadow]
+    // facing right
+    else if (face.normal.x === 1)  face.vertexColors = [shadow, light, light, shadow]
+    // facing left
+    else if (face.normal.x === -1) face.vertexColors = [shadow, shadow, light, light]
+    // facing backward
+    else if (face.normal.z === 1)  face.vertexColors = [shadow, shadow, light, light]
+    // facing forward
+    else                           face.vertexColors = [shadow, light, light, shadow]
+  }
+
+  geometry.verticesNeedUpdate = true
+  geometry.elementsNeedUpdate = true
+  geometry.normalsNeedUpdate = true
+
+  geometry.computeBoundingBox()
+  geometry.computeBoundingSphere()
+
+}
+
+Mesh.prototype.createWireMesh = function(hexColor) {    
+  var wireMaterial = new this.THREE.MeshBasicMaterial({
+    color : hexColor || 0xffffff,
+    wireframe : true
+  })
+  wireMesh = new THREE.Mesh(this.geometry, wireMaterial)
+  wireMesh.scale = this.scale
+  wireMesh.doubleSided = true
+  this.wireMesh = wireMesh
+  return wireMesh
+}
+
+Mesh.prototype.createSurfaceMesh = function(material) {
+  material = material || new this.THREE.MeshNormalMaterial()
+  var surfaceMesh  = new this.THREE.Mesh( this.geometry, material )
+  surfaceMesh.scale = this.scale
+  surfaceMesh.doubleSided = false
+  this.surfaceMesh = surfaceMesh
+  return surfaceMesh
+}
+
+Mesh.prototype.addToScene = function(scene) {
+  if (this.wireMesh) scene.add( this.wireMesh )
+  if (this.surfaceMesh) scene.add( this.surfaceMesh )
+}
+
+Mesh.prototype.setPosition = function(x, y, z) {
+  if (this.wireMesh) this.wireMesh.position = new this.THREE.Vector3(x, y, z)
+  if (this.surfaceMesh) this.surfaceMesh.position = new this.THREE.Vector3(x, y, z)
+}
+
+Mesh.prototype.faceVertexUv = function(i) {
+  var vs = [
+    this.meshed.vertices[i*4+0],
+    this.meshed.vertices[i*4+1],
+    this.meshed.vertices[i*4+2],
+    this.meshed.vertices[i*4+3]
+  ]
+  var spans = {
+    x0: vs[0][0] - vs[1][0],
+    x1: vs[1][0] - vs[2][0],
+    y0: vs[0][1] - vs[1][1],
+    y1: vs[1][1] - vs[2][1],
+    z0: vs[0][2] - vs[1][2],
+    z1: vs[1][2] - vs[2][2]
+  }
+  var size = {
+    x: Math.max(Math.abs(spans.x0), Math.abs(spans.x1)),
+    y: Math.max(Math.abs(spans.y0), Math.abs(spans.y1)),
+    z: Math.max(Math.abs(spans.z0), Math.abs(spans.z1))
+  }
+  if (size.x === 0) {
+    if (spans.y0 > spans.y1) {
+      var width = size.y
+      var height = size.z
+    }
+    else {
+      var width = size.z
+      var height = size.y
+    }
+  }
+  if (size.y === 0) {
+    if (spans.x0 > spans.x1) {
+      var width = size.x
+      var height = size.z
+    }
+    else {
+      var width = size.z
+      var height = size.x
+    }
+  }
+  if (size.z === 0) {
+    if (spans.x0 > spans.x1) {
+      var width = size.x
+      var height = size.y
+    }
+    else {
+      var width = size.y
+      var height = size.x
+    }
+  }
+  if ((size.z === 0 && spans.x0 < spans.x1) || (size.x === 0 && spans.y0 > spans.y1)) {
+    return [
+      new this.THREE.Vector2(height, 0),
+      new this.THREE.Vector2(0, 0),
+      new this.THREE.Vector2(0, width),
+      new this.THREE.Vector2(height, width)
+    ]
+  } else {
+    return [
+      new this.THREE.Vector2(0, 0),
+      new this.THREE.Vector2(0, height),
+      new this.THREE.Vector2(width, height),
+      new this.THREE.Vector2(width, 0)
+    ]
+  }
+}
+;
+
+},{"three":24}],33:[function(require,module,exports){
 var events = require('events')
 var inherits = require('inherits')
 
@@ -43002,7 +43197,7 @@ Chunker.prototype.voxelVector = function(pos) {
   return [vx, vy, vz]
 };
 
-},{"events":51,"inherits":15}],34:[function(require,module,exports){
+},{"events":52,"inherits":15}],34:[function(require,module,exports){
 var chunker = require('./chunker')
 
 module.exports = function(opts) {
@@ -43557,176 +43752,90 @@ if(exports) {
 }
 
 },{}],39:[function(require,module,exports){
-var THREE = require('three')
+var ever = require('ever')
+var vkey = require('vkey')
+var events = require('events')
 
-module.exports = function(data, mesher, scaleFactor, three) {
-  return new Mesh(data, mesher, scaleFactor, three)
+var game
+
+module.exports = function(gameInstance) {
+  // cache the game instance
+  game = gameInstance
+  return function makeFly(physical, noKeyEvents) {
+    return new Fly(physical, noKeyEvents)
+  }
 }
 
-module.exports.Mesh = Mesh
+function Fly(physical, noKeyEvents) {
+  this.flySpeed = 0.8
+  this.physical = physical
+  if (!noKeyEvents) this.bindKeyEvents()
+}
 
-function Mesh(data, mesher, scaleFactor, three) {
-  this.THREE = three || THREE
-  this.data = data
-  var geometry = this.geometry = new this.THREE.Geometry()
-  this.scale = scaleFactor || new this.THREE.Vector3(10, 10, 10)
+Fly.prototype.bindKeyEvents = function(el) {
+  if (!el) el = document.body
+  var self = this
+  var counter = 0
+  var spaceUpAfterFirstDown = false
+  var first = Date.now()
+  ever(el)
+    .on('keydown', onKeyDown)
+    .on('keyup', onKeyUp)
   
-  var result = mesher( data.voxels, data.dims )
-  this.meshed = result
-
-  geometry.vertices.length = 0
-  geometry.faces.length = 0
-
-  for (var i = 0; i < result.vertices.length; ++i) {
-    var q = result.vertices[i]
-    geometry.vertices.push(new this.THREE.Vector3(q[0], q[1], q[2]))
-  } 
-  
-  for (var i = 0; i < result.faces.length; ++i) {
-    geometry.faceVertexUvs[0].push(this.faceVertexUv(i))
-    
-    var q = result.faces[i]
-    if (q.length === 5) {
-      var f = new this.THREE.Face4(q[0], q[1], q[2], q[3])
-      f.color = new this.THREE.Color(q[4])
-      geometry.faces.push(f)
-    } else if (q.length == 4) {
-      var f = new this.THREE.Face3(q[0], q[1], q[2])
-      f.color = new this.THREE.Color(q[3])
-      geometry.faces.push(f)
+  function onKeyDown(ev) {
+    var key = vkey[ev.keyCode] || ev.char
+    var binding = game.keybindings[key]
+    if (binding !== "jump") return
+    if (counter === 1) {
+      if (Date.now() - first > 300) {
+        spaceUpAfterFirstDown = false
+        return first = Date.now()
+      } else {
+        if (!self.flying && spaceUpAfterFirstDown) {
+          self.startFlying()
+        }
+      }
+      spaceUpAfterFirstDown = false
+      return counter = 0
+    }
+    if (counter === 0) {
+      first = Date.now()
+      counter += 1
     }
   }
   
-  geometry.computeFaceNormals()
-
-  // compute vertex colors for ambient occlusion
-  var light = new THREE.Color(0xffffff)
-  var shadow = new THREE.Color(0x505050)
-  for (var i = 0; i < geometry.faces.length; ++i) {
-    var face = geometry.faces[i]
-    // facing up
-    if (face.normal.y === 1)       face.vertexColors = [light, light, light, light]
-    // facing down
-    else if (face.normal.y === -1) face.vertexColors = [shadow, shadow, shadow, shadow]
-    // facing right
-    else if (face.normal.x === 1)  face.vertexColors = [shadow, light, light, shadow]
-    // facing left
-    else if (face.normal.x === -1) face.vertexColors = [shadow, shadow, light, light]
-    // facing backward
-    else if (face.normal.z === 1)  face.vertexColors = [shadow, shadow, light, light]
-    // facing forward
-    else                           face.vertexColors = [shadow, light, light, shadow]
-  }
-
-  geometry.verticesNeedUpdate = true
-  geometry.elementsNeedUpdate = true
-  geometry.normalsNeedUpdate = true
-
-  geometry.computeBoundingBox()
-  geometry.computeBoundingSphere()
-
-}
-
-Mesh.prototype.createWireMesh = function(hexColor) {    
-  var wireMaterial = new this.THREE.MeshBasicMaterial({
-    color : hexColor || 0xffffff,
-    wireframe : true
-  })
-  wireMesh = new THREE.Mesh(this.geometry, wireMaterial)
-  wireMesh.scale = this.scale
-  wireMesh.doubleSided = true
-  this.wireMesh = wireMesh
-  return wireMesh
-}
-
-Mesh.prototype.createSurfaceMesh = function(material) {
-  material = material || new this.THREE.MeshNormalMaterial()
-  var surfaceMesh  = new this.THREE.Mesh( this.geometry, material )
-  surfaceMesh.scale = this.scale
-  surfaceMesh.doubleSided = false
-  this.surfaceMesh = surfaceMesh
-  return surfaceMesh
-}
-
-Mesh.prototype.addToScene = function(scene) {
-  if (this.wireMesh) scene.add( this.wireMesh )
-  if (this.surfaceMesh) scene.add( this.surfaceMesh )
-}
-
-Mesh.prototype.setPosition = function(x, y, z) {
-  if (this.wireMesh) this.wireMesh.position = new this.THREE.Vector3(x, y, z)
-  if (this.surfaceMesh) this.surfaceMesh.position = new this.THREE.Vector3(x, y, z)
-}
-
-Mesh.prototype.faceVertexUv = function(i) {
-  var vs = [
-    this.meshed.vertices[i*4+0],
-    this.meshed.vertices[i*4+1],
-    this.meshed.vertices[i*4+2],
-    this.meshed.vertices[i*4+3]
-  ]
-  var spans = {
-    x0: vs[0][0] - vs[1][0],
-    x1: vs[1][0] - vs[2][0],
-    y0: vs[0][1] - vs[1][1],
-    y1: vs[1][1] - vs[2][1],
-    z0: vs[0][2] - vs[1][2],
-    z1: vs[1][2] - vs[2][2]
-  }
-  var size = {
-    x: Math.max(Math.abs(spans.x0), Math.abs(spans.x1)),
-    y: Math.max(Math.abs(spans.y0), Math.abs(spans.y1)),
-    z: Math.max(Math.abs(spans.z0), Math.abs(spans.z1))
-  }
-  if (size.x === 0) {
-    if (spans.y0 > spans.y1) {
-      var width = size.y
-      var height = size.z
-    }
-    else {
-      var width = size.z
-      var height = size.y
+  function onKeyUp(ev) {
+    var key = vkey[ev.keyCode] || ev.char
+    if (key === '<space>' && counter === 1) {
+      spaceUpAfterFirstDown = true
     }
   }
-  if (size.y === 0) {
-    if (spans.x0 > spans.x1) {
-      var width = size.x
-      var height = size.z
-    }
-    else {
-      var width = size.z
-      var height = size.x
-    }
-  }
-  if (size.z === 0) {
-    if (spans.x0 > spans.x1) {
-      var width = size.x
-      var height = size.y
-    }
-    else {
-      var width = size.y
-      var height = size.x
-    }
-  }
-  if ((size.z === 0 && spans.x0 < spans.x1) || (size.x === 0 && spans.y0 > spans.y1)) {
-    return [
-      new this.THREE.Vector2(height, 0),
-      new this.THREE.Vector2(0, 0),
-      new this.THREE.Vector2(0, width),
-      new this.THREE.Vector2(height, width)
-    ]
-  } else {
-    return [
-      new this.THREE.Vector2(0, 0),
-      new this.THREE.Vector2(0, height),
-      new this.THREE.Vector2(width, height),
-      new this.THREE.Vector2(width, 0)
-    ]
-  }
 }
-;
 
-},{"three":25}],40:[function(require,module,exports){
+Fly.prototype.startFlying = function() {
+  var self = this
+  this.flying = true
+  var physical = this.physical
+  physical.removeForce(game.gravity)
+  physical.onGameTick = function(dt) {
+    if (physical.atRestY() === -1) return self.stopFlying()
+    physical.friction.x = self.flySpeed
+    physical.friction.z = self.flySpeed
+    var press = game.controls.state
+    if (press['crouch']) return physical.velocity.y = -0.01
+    if (press['jump']) return physical.velocity.y = 0.01
+    physical.velocity.y = 0
+  }
+  game.on('tick', physical.onGameTick)
+}
+
+Fly.prototype.stopFlying = function() {
+  this.flying = false
+  var physical = this.physical
+  physical.subjectTo(game.gravity)
+  game.removeListener('tick', physical.onGameTick)
+}
+},{"events":52,"ever":10,"vkey":27}],40:[function(require,module,exports){
 module.exports = physical
 
 var aabb = require('aabb-3d')
@@ -43945,7 +44054,7 @@ proto.atRestZ = function() {
   return this.resting.z
 }
 
-},{"aabb-3d":2,"three":25}],41:[function(require,module,exports){
+},{"aabb-3d":2,"three":24}],41:[function(require,module,exports){
 var skin = require('minecraft-skin');
 
 module.exports = function (game) {
@@ -44275,7 +44384,402 @@ function coordinates(spatial, box, regionWidth) {
  
   return emitter
 }
-},{"aabb-3d":2,"events":51}],44:[function(require,module,exports){
+},{"aabb-3d":2,"events":52}],44:[function(require,module,exports){
+
+module.exports = function(game,opts) {
+    var updated = {};
+    if (!opts) opts = {};
+    if (!opts.pos) opts.pos = {
+        x:0,
+        y:2,
+        z:3
+    };
+    if (!opts.width) opts.width = 6;
+    if (!opts.height) opts.height = 20;
+    if (!opts.length) opts.length = 6;
+    if (!opts.material) opts.material = 1;
+    if (!opts.droprate) opts.droprate = 25;
+    if (!opts.levels) opts.levels = [1,5,10,25,50,100,200,500,1000,50000];
+    if (!opts.speedincrease) opts.speedincrease = 0;
+    
+    var overflag = false;
+    var voxels = game.voxels;
+    var size = voxels.cubeSize;
+    
+    var pieces = [];
+    var droplocation;
+    var droprate = opts.droprate;
+    var time = 0;
+    var rowsremoved = 0;
+      
+    this.command = function(c,pindex) {
+        if (!pindex) pindex = 0;
+        switch(c){
+            case 0:
+                spin(pindex,1);
+                break;
+            case 1:
+                spin(pindex,-1);
+                break;
+            case 2:
+                move(pindex,1,0,0);
+                break;
+            case 3:
+                move(pindex,-1,0,0);
+                break;
+            case 4:
+                moveDown(pindex);
+                break;
+            case 5:
+                slam(pindex);
+                break;
+        }
+    }
+    this.slam = function(pindex) {
+        if (!pindex) pindex = 0;
+        var piece = pieces[pindex];
+        unshow(piece);
+        do {
+            piece.dy -= 1; 
+            reposition(piece);
+        } while (isValid(piece));
+        piece.dy += 1;
+        reposition(piece);
+        show(piece);
+        flush();
+        checkRows();
+        pieces.pop();
+    }
+    this.moveDown = function(pindex) {
+        if (!pindex) pindex = 0;
+        move(pindex,0,-1,0,function() {
+            checkRows();
+            pieces.pop();
+        });
+    }
+    
+    this.touch = function(pos) {
+        if (pos.y < (opts.pos.y - size)) {
+            command(5);
+            return;
+        }
+        if (pos.y < opts.pos.y) {
+            command(4);
+            return;
+        }
+        if (pos.x > (opts.pos.x + (opts.width*size))) {
+            command(2);
+            return;
+        }
+        if (pos.x < (opts.pos.x)) {
+            command(3);
+            return;
+        }
+        command(0); //no longer turn the other direction.
+    }
+    
+    this.spin = function(pindex, cw, failop) {
+        var piece = pieces[pindex];
+        unshow(piece);
+        piece.spin += cw;
+        reposition(piece);
+        if (!isValid(piece)) {
+            piece.spin -= cw;
+            reposition(piece);
+            show(piece);
+            if (failop) failop();
+            return false;
+        }
+        else {
+            show(piece);
+        }
+        flush();
+        return true;
+    }
+        
+    this.move = function (pindex, mx, my, mz, failop) {
+        var piece = pieces[pindex];
+        unshow(piece);
+        piece.dx += mx;
+        piece.dy += my;
+        piece.dz += mz;
+        reposition(piece);
+        if (!isValid(piece)) {
+            piece.dx -= mx;
+            piece.dy -= my;
+            piece.dz -= mz;    
+            reposition(piece);
+            show(piece);
+            if (failop) failop();
+            return false;
+        }
+        else {
+            show(piece);
+        }
+        flush();
+        return true;
+    }
+    
+    this.removeRow = function(m) {
+        for (var r = 0; r < opts.width; r++) {
+            game.setBlock([opts.pos.x + (r * size), opts.pos.y + (m * size), opts.pos.z],0);
+        }
+        for (var k = m; k < opts.height; k++) {
+            for (var j = 0; j < opts.width; j++) {
+                game.setBlock([opts.pos.x + (j * size), opts.pos.y + (k * size), opts.pos.z],
+                    game.getBlock([opts.pos.x + (j * size), opts.pos.y + ((k+1) * size), opts.pos.z]));
+            }
+        }
+        rowsremoved++;
+        checkLevel();
+        flush();
+    }
+    this.checkLevel  = function() {
+        for (var i = 0; i < opts.levels.length; i++) {
+            if (rowsremoved == opts.levels[i]) {
+                setBoard(i);
+                faster();
+                return;
+            }
+            if (rowsremoved < opts.levels[i]) {
+                return;
+            }
+        }
+    }
+    this.gameOver = function() {
+        clearBoard();
+        resetSpeed();
+        setBoard(opts.material);
+        overflag = true;
+        rowsremoved = 0;
+
+    }
+    
+    this.checkRows = function() {
+        var row;
+        for (var m = 0; m < opts.height;) {
+            console.log("before", m)
+            row = true;
+            for (var n = 0; n < opts.width; n++) {
+
+                    console.log("m :", m, "n :", n, game.getBlock([opts.pos.x + (n * size), opts.pos.y + (m * size), opts.pos.z]))
+                if (!game.getBlock([opts.pos.x + (n * size), opts.pos.y + (m * size), opts.pos.z])) {
+                    row = false;
+                    break;
+                }
+            }
+            if (row) {
+                removeRow(m);
+            }
+            else {
+                ++m;
+            }
+        }
+    }
+    
+    this.doTick = function() {
+        if ((!pieces) || pieces.length == 0) {
+            makePiece();
+        }
+
+        if (!pieces) return;
+        for (var i = 0; i < pieces.length; i++) {
+            moveDown(i);
+        }
+    }
+    this.tick = function () {
+        time++;
+        if (time % droprate == 0) {
+            doTick();
+        }
+    }
+    this.faster = function() {
+        droprate = Math.ceil(droprate * (1-opts.speedincrease));
+    }
+    this.slower = function() {
+        droprate = Math.ceil(droprate * (1-opts.speedincrease));
+    }
+    this.resetSpeed = function() {
+        droprate = opts.droprate;
+    }
+    this.clearBoard = function() {
+        var x = opts.pos.x, y = opts.pos.y, z = opts.pos.z;
+        for (var m = 0; m < opts.height+5; m++) {
+            for (var n = 0; n < opts.width; n++) {
+                set({
+                    x: x + size*n , 
+                    y: y+size*m, 
+                    z: z
+                },0);
+            }
+        }
+    }
+    this.setBoard = function(material) {
+        var x = opts.pos.x, y = opts.pos.y, z = opts.pos.z;
+        if (!material) material = opts.material;
+        
+        for (var m = -1; m <= opts.height; m++) {
+            set({
+                x: x -1,                
+                y: y+size*m, 
+                z: z
+            }, material);
+            set({
+                x: x + size*opts.width, 
+                y: y+size*m, 
+                z: z
+            }, material);
+        }
+        for (var q = -1; q <= opts.width; q++) {
+            set({
+                x: x + size * q , 
+                y: y - 1*size, 
+                z: z
+            }, material);
+        }
+    }
+    
+    this.setDroplocation = function(x,y,z) {
+        droplocation = {
+            x: x, 
+            y: y, 
+            z: z
+        };
+    }
+    this.makeBoard = function() {
+        var x = opts.pos.x, y = opts.pos.y, z = opts.pos.z;
+        clearBoard();
+        setBoard(opts.material);
+        setDroplocation(x + (opts.width * size)/2,y + (opts.height * size),z);
+        flush();
+    }
+
+    this.makePiece = function(pos, type) {
+        if (!pos) pos = droplocation;
+        if (!type) type = Math.floor((Math.random() * 7));
+        var piece = [];
+        switch (type) {
+            case 0: //block
+                piece = [{corex: 0, corey: 0, corez: 0}, {corex: 0, corey: 1, corez: 0},{corex: 1, corey: 0, corez: 0},{corex: 1, corey: 1, corez: 0}]
+                break;
+
+            case 1: //long
+                piece = [{corex: -1, corey: 0, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 0},{corex: 2, corey: 0, corez: 0}]
+                break;
+
+            case 2: //L
+                piece = [{corex: 0, corey: -2, corez: 0}, {corex: 0, corey: -1, corez: 0},{corex: 0, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 0}]
+                break;
+
+            case 3: //Inverted L
+                piece = [{corex: 0, corey: -2, corez: 0}, {corex: 0, corey: -1, corez: 0},{corex: 0, corey: 0, corez: 0},{corex: -1, corey: 0, corez: 0}]
+                break;
+
+            case 4: //T
+                piece = [{corex: -1, corey: 0, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 0},{corex: 0, corey: 1, corez: 0}]
+                break;
+
+            case 5://S
+                piece = [{corex: 0, corey: 1, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: -1, corey: 0, corez: 0},{corex: -1, corey: -1, corez: 0}]
+                break;
+
+            case 6://Inverted S
+                piece = [{corex: 0, corey: 1, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 0},{corex: 1, corey: -1, corez: 0}]
+                break;
+        }
+        piece.material = type % 4 + 3;
+        piece.initx = pos.x;
+        piece.inity = pos.y;
+        piece.initz = pos.z;
+        piece.dx = 0;
+        piece.dy = 0;
+        piece.dz = 0;
+        piece.spin = 0;
+        reposition(piece);
+        if (!isValid(piece)) {
+            gameOver();
+            return;
+        }
+        show(piece);
+        if (!pieces) pieces = [];
+        pieces.push(piece);
+        flush();
+    }
+    
+    this.reposition = function(piece) {
+        for (var i = 0; i < piece.length; i++) {
+            var block = piece[i];
+            var nx;
+            var ny;
+            var nz = block.corez;
+            var spin = piece.spin;
+            while (spin < 0) spin+=4;
+            spin %= 4;
+            switch (spin) {
+                case 0:
+                    nx = block.corex;
+                    ny = block.corey;
+                    break;            
+                case 1:
+                    nx = block.corey;
+                    ny = -block.corex;
+                    break;
+                case 2:
+                    nx = -block.corex;
+                    ny = -block.corey;
+                    break;
+                case 3:
+                    nx = -block.corey;
+                    ny = block.corex;
+            }
+            block.x = ((nx + piece.dx) * size) + piece.initx;
+            block.y = ((ny + piece.dy) * size) + piece.inity;
+            block.z = ((nz + piece.dz) * size) + piece.initz;
+        }
+    }
+    
+    var show = function(piece) {
+        for (var i = 0; i < piece.length; i++) {
+            game.setBlock([piece[i].x,piece[i].y,piece[i].z],piece.material);
+        }
+    }
+    
+    var unshow = function(piece) {
+        for (var i = 0; i < piece.length; i++) {
+            game.setBlock([piece[i].x,piece[i].y,piece[i].z],0);
+        }
+    }
+
+    
+    function isValid(piece) {
+        for (var i = 0; i < piece.length; i++) {
+            if (game.getBlock([piece[i].x,piece[i].y,piece[i].z])) return false;
+        }
+        return true;
+    }
+    
+    function set (posxyz, value) {
+        voxels.voxelAtPosition(posxyz, value);
+        var c = voxels.chunkAtPosition(posxyz);
+        var key = c.join('|');
+        if (!updated[key] && voxels.chunks[key]) {
+            updated[key] = voxels.chunks[key];
+        }
+    }
+    
+    function flush() {
+        Object.keys(updated).forEach(function (key) {
+            game.showChunk(updated[key]);
+        });
+    }
+    
+    
+        
+    makeBoard();
+    return this;
+};
+
+},{}],45:[function(require,module,exports){
 var tic = require('tic')();
 var createAtlas = require('atlaspack');
 
@@ -44662,7 +45166,7 @@ function memoize(func) {
   return memoized;
 }
 
-},{"atlaspack":3,"tic":27}],45:[function(require,module,exports){
+},{"atlaspack":3,"tic":26}],46:[function(require,module,exports){
 (function (process){
 var THREE, temporaryPosition, temporaryVector
 
@@ -44752,7 +45256,7 @@ View.prototype.appendTo = function(element) {
   this.resizeWindow(this.width,this.height)
 }
 }).call(this,require('_process'))
-},{"_process":58}],46:[function(require,module,exports){
+},{"_process":59}],47:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -44868,9 +45372,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],47:[function(require,module,exports){
-
 },{}],48:[function(require,module,exports){
+
+},{}],49:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -44982,7 +45486,7 @@ exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"buffer":49}],49:[function(require,module,exports){
+},{"buffer":50}],50:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -46775,7 +47279,7 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":46,"ieee754":52,"isarray":55}],50:[function(require,module,exports){
+},{"base64-js":47,"ieee754":53,"isarray":56}],51:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -46886,7 +47390,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":54}],51:[function(require,module,exports){
+},{"../../is-buffer/index.js":55}],52:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -47190,7 +47694,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -47276,7 +47780,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -47301,7 +47805,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -47324,14 +47828,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -47559,7 +48063,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":58}],57:[function(require,module,exports){
+},{"_process":59}],58:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -47606,7 +48110,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":58}],58:[function(require,module,exports){
+},{"_process":59}],59:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -47788,10 +48292,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":60}],60:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":61}],61:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -47867,7 +48371,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":62,"./_stream_writable":64,"core-util-is":50,"inherits":53,"process-nextick-args":57}],61:[function(require,module,exports){
+},{"./_stream_readable":63,"./_stream_writable":65,"core-util-is":51,"inherits":54,"process-nextick-args":58}],62:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -47894,7 +48398,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":63,"core-util-is":50,"inherits":53}],62:[function(require,module,exports){
+},{"./_stream_transform":64,"core-util-is":51,"inherits":54}],63:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -48838,7 +49342,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":60,"./internal/streams/BufferList":65,"_process":58,"buffer":49,"buffer-shims":48,"core-util-is":50,"events":51,"inherits":53,"isarray":55,"process-nextick-args":57,"string_decoder/":71,"util":47}],63:[function(require,module,exports){
+},{"./_stream_duplex":61,"./internal/streams/BufferList":66,"_process":59,"buffer":50,"buffer-shims":49,"core-util-is":51,"events":52,"inherits":54,"isarray":56,"process-nextick-args":58,"string_decoder/":72,"util":48}],64:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -49021,7 +49525,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":60,"core-util-is":50,"inherits":53}],64:[function(require,module,exports){
+},{"./_stream_duplex":61,"core-util-is":51,"inherits":54}],65:[function(require,module,exports){
 (function (process){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
@@ -49202,7 +49706,7 @@ WritableState.prototype.getBuffer = function getBuffer() {
 // Test _writableState for inheritance to account for Duplex streams,
 // whose prototype chain only points to Readable.
 var realHasInstance;
-if (typeof Symbol === 'function' && Symbol.hasInstance) {
+if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {
   realHasInstance = Function.prototype[Symbol.hasInstance];
   Object.defineProperty(Writable, Symbol.hasInstance, {
     value: function (object) {
@@ -49578,7 +50082,7 @@ function CorkedRequest(state) {
   };
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":60,"_process":58,"buffer":49,"buffer-shims":48,"core-util-is":50,"events":51,"inherits":53,"process-nextick-args":57,"util-deprecate":72}],65:[function(require,module,exports){
+},{"./_stream_duplex":61,"_process":59,"buffer":50,"buffer-shims":49,"core-util-is":51,"events":52,"inherits":54,"process-nextick-args":58,"util-deprecate":73}],66:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('buffer').Buffer;
@@ -49643,10 +50147,10 @@ BufferList.prototype.concat = function (n) {
   }
   return ret;
 };
-},{"buffer":49,"buffer-shims":48}],66:[function(require,module,exports){
+},{"buffer":50,"buffer-shims":49}],67:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":61}],67:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":62}],68:[function(require,module,exports){
 (function (process){
 var Stream = (function (){
   try {
@@ -49666,13 +50170,13 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":60,"./lib/_stream_passthrough.js":61,"./lib/_stream_readable.js":62,"./lib/_stream_transform.js":63,"./lib/_stream_writable.js":64,"_process":58}],68:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":61,"./lib/_stream_passthrough.js":62,"./lib/_stream_readable.js":63,"./lib/_stream_transform.js":64,"./lib/_stream_writable.js":65,"_process":59}],69:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":63}],69:[function(require,module,exports){
+},{"./lib/_stream_transform.js":64}],70:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":64}],70:[function(require,module,exports){
+},{"./lib/_stream_writable.js":65}],71:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -49801,7 +50305,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":51,"inherits":53,"readable-stream/duplex.js":59,"readable-stream/passthrough.js":66,"readable-stream/readable.js":67,"readable-stream/transform.js":68,"readable-stream/writable.js":69}],71:[function(require,module,exports){
+},{"events":52,"inherits":54,"readable-stream/duplex.js":60,"readable-stream/passthrough.js":67,"readable-stream/readable.js":68,"readable-stream/transform.js":69,"readable-stream/writable.js":70}],72:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -50024,7 +50528,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":49}],72:[function(require,module,exports){
+},{"buffer":50}],73:[function(require,module,exports){
 (function (global){
 
 /**

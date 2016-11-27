@@ -5,7 +5,7 @@ var fly = require('voxel-fly')
 //var plugins = createPlugins(game, {require:require});
 //var mesher = game.plugins.get('voxel-mesher');
 var game = createGame({
-	texturePath: '/textures/',
+	texturePath: 'shimjunghoon.github.com/textures/',
 	materials: ['black', 'frame', 'red', 'blue', 'green', 'yellow'],
 	generate: function(x, y, z){
 		if((x === -5 || x === 10) || (z === -5 || z === 20) || y === 0) return 2;
