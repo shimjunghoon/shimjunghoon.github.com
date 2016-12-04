@@ -10,7 +10,7 @@ var fly = require('voxel-fly')
 var tetris = require('voxel-tetris')
 
 var game = createGame({
-	texturePath:  'shimjunghoon.github.com/textures/',
+	texturePath: 'shimjunghoon.github.com/textures/',
 	materials: ['black', 'frame', 'renewer-red', 'renewer-blue', 'renewer-green', 'renewer-yellow', 'renewer-green2', 'renewer-purple', 'renewer-orange',
 	'red-tile', 'blue-tile', 'green-tile', 'yellow-tile'],
 	generate: function(x, y, z){
