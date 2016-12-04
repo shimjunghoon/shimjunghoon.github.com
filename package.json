@@ -13,7 +13,9 @@
     "voxel-plugins": "^0.5.0",
     "voxel-tetris": "0.0.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "voxel-sky": "^0.3.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
