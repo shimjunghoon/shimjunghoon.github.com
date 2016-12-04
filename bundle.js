@@ -1,20 +1,37 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var containter = document.querySelector('#containter')
+
+
+
+
+
+///////
+var container = document.querySelector('#container')
 var createGame = require('voxel-engine')
 var fly = require('voxel-fly')
-//var createPlugins = require('voxel-plugins');
-//var plugins = createPlugins(game, {require:require});
-//var mesher = game.plugins.get('voxel-mesher');
+var tetris = require('voxel-tetris')
+
 var game = createGame({
-	texturePath: '/textures/',
-	materials: ['black', 'frame', 'red', 'blue', 'green', 'yellow'],
+	texturePath: 'shimjunghoon.github.com/textures/',
+	materials: ['black', 'frame', 'renewer-red', 'renewer-blue', 'renewer-green', 'renewer-yellow', 'renewer-green2', 'renewer-purple', 'renewer-orange',
+	'red-tile', 'blue-tile', 'green-tile', 'yellow-tile'],
 	generate: function(x, y, z){
-		if((x === -5 || x === 10) || (z === -5 || z === 20) || y === 0) return 2;
-		if((x === -1 || x === 6) && (y >= 1 && y <= 20) && z === 3) return 1;
-		return y === 1 && x >= 0 &&  x <= 5 && z === 3 ? 1 : 0
+		if(x >= 0 && x <= 5 && y === 0 && z >= 3 && z <= 8) return 1;
+		return 0
+	},
+	skyColor: 0xFFFFFF,
+	keybindings: {
+		'<up>': 'forward'
+		, '<left>': 'left'
+		, '<down>': 'backward'
+		, '<right>': 'right'
+		, 'J': 'jump'
+		, '<shift>': 'crouch'
+		, '<control>': 'alt'
 	},
 	worldOrigin: [0, 0, 0],
+	container: 'container'
 })
+
 
 window.game = game
 game.appendTo(container)
@@ -22,47 +39,153 @@ game.appendTo(container)
 var createPlayer = require('voxel-player')(game)
 var player = createPlayer('skin.png')
 
-player.position.set(4, 1, 19)
-player.possess()
+player.position.set(3, 4, 40)
+player.possess();
 
-
-// var mesh = mesher.createVoxelMesh(voxels, voxelSideTextureIDs, voxelSideTextureSizes, position, pad)
 var makeFly = fly(game)
 var target = game.controls.target()
-game.flyer = makeFly(target)
+game.flyer = makeFly(target, false)
+game.flyer.startFlying()
 
+var explode1 = require('voxel-debris')(game, { power : 1.5 });
+
+game.explode = explode1;
+
+var tetris1 = new tetris(game, {
+	pos: {
+		x:0,
+		y:1,
+		z:3
+	}
+})
+tetris1.makeBoard();
 window.addEventListener('keydown', function(ev){
-	if(ev.keyCode === '1'.charCodeAt(0)){
-		tetris.command(0)
+	if(ev.keyCode === 49){
+		player.position.set(4,10,-50)
 	}
-	if(ev.keyCode === '2'.charCodeAt(0)){
-		tetris.command(1)
+	if(ev.keyCode === 88){ //X
+		tetris1.command(0);
 	}
-	if(ev.keyCode === '3'.charCodeAt(0)){
-		tetris.command(3)
+	if(ev.keyCode === 83){ //S
+		tetris1.command(1);
 	}
-	if(ev.keyCode === '4'.charCodeAt(0)){
-		tetris.command(2)
+	if(ev.keyCode === 87){ //W
+		tetris1.command(2);
 	}
-	if(ev.keyCode === '5'.charCodeAt(0)){
-		tetris.command(4)
+	if(ev.keyCode === 68){ //A
+		tetris1.command(3);
 	}
-	if(ev.keyCode === 'R'.charCodeAt(0)){
-		tetris.command(5)
+	if(ev.keyCode === 65){ //D
+		tetris1.command(4);
+	}
+	if(ev.keyCode === 90){ //Z
+		tetris1.command(5);
+	}
+	if(ev.keyCode === 69){ //E
+		tetris1.command(6);
+	}
+	if(ev.keyCode === 32){ //space
+		tetris1.command(8);
 	}
 })
 
-var tetris = require('voxel-tetris')(game)
-
-
-tetris.setDroplocation(3, 20, 3)
-
-
 game.on('tick', function() {
-  if(!tetris.overflag) tetris.tick();
-	else console.log("end");
+  if(!tetris1.overflag) tetris1.tick();
+  explode1(5, 5, 5);
 });
-},{"voxel-engine":29,"voxel-fly":39,"voxel-player":41,"voxel-tetris":44}],2:[function(require,module,exports){
+
+
+
+////
+
+var createGame2 = require('voxel-engine')
+
+
+var game2 = createGame2({
+	texturePath: './textures/',
+	materials: ['black', 'frame', 'renewer-red', 'renewer-blue', 'renewer-green', 'renewer-yellow', 'renewer-green2', 'renewer-purple', 'renewer-orange',
+	'red-tile', 'blue-tile', 'green-tile', 'yellow-tile'],
+	generate: function(x, y, z){
+		if(x >= 0 && x <= 5 && y === 0 && z >= 3 && z <= 8) return 1;
+		return 0
+	},
+	skyColor: 0xFFFFFF,
+	keybindings: {
+		'J': 'jump'
+		, '<shift>': 'crouch'
+		, '<control>': 'alt'
+	},
+	worldOrigin: [0, 0, 0],
+	container: 'container2'
+})
+
+console.log(game.materials)
+
+
+window.game2 = game2
+game2.appendTo(container2)
+
+var createPlayer2 = require('voxel-player')(game2)
+var player2 = createPlayer2('skin.png')
+
+player2.position.set(3, 4, 40)
+player2.possess();
+
+var makeFly2 = fly(game2)
+var target2 = game2.controls.target()
+game2.flyer = makeFly2(target2, false)
+game2.flyer.startFlying()
+
+var explode2 = require('voxel-debris')(game2, { power : 1.5 });
+
+game2.explode = explode2;
+
+var tetris2 = new tetris(game2, {
+	pos: {
+		x:0,
+		y:1,
+		z:3
+	},
+	width: 10,
+	length: 10,
+
+})
+tetris2.makeBoard();
+
+window.addEventListener('keydown', function(ev){
+	if(ev.keyCode === 49){
+//		player2.position.set(4,10,-50)
+	}
+	if(ev.keyCode === 88){ //X
+		tetris2.command(0);
+	}
+	if(ev.keyCode === 83){ //S
+		tetris2.command(1);
+	}
+	if(ev.keyCode === 87){ //W
+		tetris2.command(2);
+	}
+	if(ev.keyCode === 68){ //A
+		tetris2.command(3);
+	}
+	if(ev.keyCode === 65){ //D
+		tetris2.command(4);
+	}
+	if(ev.keyCode === 90){ //Z
+		tetris2.command(5);
+	}
+	if(ev.keyCode === 69){ //E
+		tetris2.command(6);
+	}
+	if(ev.keyCode === 32){ //space
+		tetris2.command(8);
+	}
+})
+
+game2.on('tick', function() {
+  if(!tetris2.overflag) tetris2.tick();
+});
+},{"voxel-debris":30,"voxel-engine":31,"voxel-fly":41,"voxel-player":43,"voxel-tetris":46}],2:[function(require,module,exports){
 module.exports = AABB
 
 var vec3 = require('gl-matrix').vec3
@@ -161,7 +284,7 @@ proto.union = function(aabb) {
   return new AABB([base_x, base_y, base_z], [max_x - base_x, max_y - base_y, max_z - base_z])
 }
 
-},{"gl-matrix":14}],3:[function(require,module,exports){
+},{"gl-matrix":15}],3:[function(require,module,exports){
 (function (global){
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.atlaspack=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
@@ -664,7 +787,7 @@ function valueFromElement(el) {
   return el.value
 }
 
-},{"stream":71}],8:[function(require,module,exports){
+},{"stream":73}],8:[function(require,module,exports){
 module.exports = DOMStream
 
 var Stream = require('stream').Stream
@@ -746,7 +869,7 @@ proto.constructTextPlain = function(data) {
   return [textNode]
 }
 
-},{"stream":71}],9:[function(require,module,exports){
+},{"stream":73}],9:[function(require,module,exports){
 module.exports = dragstream
 
 var Stream = require('stream')
@@ -814,7 +937,7 @@ function dragstream(el) {
   }
 }
 
-},{"domnode-dom":5,"stream":71,"through":25}],10:[function(require,module,exports){
+},{"domnode-dom":5,"stream":73,"through":26}],10:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 
 module.exports = function (elem) {
@@ -926,7 +1049,7 @@ Ever.typeOf = (function () {
     };
 })();;
 
-},{"./init.json":11,"./types.json":12,"events":52}],11:[function(require,module,exports){
+},{"./init.json":11,"./types.json":12,"events":54}],11:[function(require,module,exports){
 module.exports={
   "initEvent" : [
     "type",
@@ -1105,7 +1228,31 @@ function shim(el) {
     el.oRequestFullScreen)
 }
 
-},{"events":52}],14:[function(require,module,exports){
+},{"events":54}],14:[function(require,module,exports){
+module.exports = function (obj, fn) {
+    var f = function () {
+        if (typeof fn !== 'function') return;
+        return fn.apply(obj, arguments);
+    };
+    
+    function C () {}
+    C.prototype = Object.getPrototypeOf(obj);
+    f.__proto__ = new C;
+    
+    Object.getOwnPropertyNames(Function.prototype).forEach(function (key) {
+        if (f[key] === undefined) {
+            f.__proto__[key] = Function.prototype[key];
+        }
+    });
+    
+    Object.getOwnPropertyNames(obj).forEach(function (key) {
+        f[key] = obj[key];
+    });
+    
+    return f;
+};
+
+},{}],15:[function(require,module,exports){
 /**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -4178,7 +4325,7 @@ if(typeof(exports) !== 'undefined') {
   })(shim.exports);
 })();
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = inherits
 
 function inherits (c, p, proto) {
@@ -4209,7 +4356,7 @@ function inherits (c, p, proto) {
 //inherits(Child, Parent)
 //new Child
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var lock = require('pointer-lock')
   , drag = require('drag-stream')
   , full = require('fullscreen')
@@ -4316,7 +4463,7 @@ function usedrag(el) {
   return ee
 }
 
-},{"drag-stream":9,"events":52,"fullscreen":13,"pointer-lock":20,"stream":71}],17:[function(require,module,exports){
+},{"drag-stream":9,"events":54,"fullscreen":13,"pointer-lock":21,"stream":73}],18:[function(require,module,exports){
 var ever = require('ever')
   , vkey = require('vkey')
   , max = Math.max
@@ -4413,7 +4560,7 @@ module.exports = function(el, bindings, state) {
   }
 }
 
-},{"ever":10,"vkey":27}],18:[function(require,module,exports){
+},{"ever":10,"vkey":28}],19:[function(require,module,exports){
 var THREE
 
 module.exports = function(three, image, sizeRatio) {
@@ -4785,7 +4932,7 @@ Skin.prototype.createPlayerObject = function(scene) {
   playerGroup.scale = this.scale
   return playerGroup
 }
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = pin
 
 var pins = {}
@@ -4867,7 +5014,7 @@ function pin(item, every, obj, name) {
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = pointer
 
 pointer.available = available
@@ -5031,7 +5178,7 @@ function shim(el) {
     null
 }
 
-},{"events":52,"stream":71}],21:[function(require,module,exports){
+},{"events":54,"stream":73}],22:[function(require,module,exports){
 module.exports = raf
 
 var EE = require('events').EventEmitter
@@ -5078,7 +5225,7 @@ function raf(el) {
 raf.polyfill = _raf
 raf.now = function() { return Date.now() }
 
-},{"events":52}],22:[function(require,module,exports){
+},{"events":54}],23:[function(require,module,exports){
 module.exports = SpatialEventEmitter
 
 var slice = [].slice
@@ -5210,7 +5357,7 @@ function finite(bbox) {
          isFinite(bbox.z1())
 }
 
-},{"./tree":23,"aabb-3d":2}],23:[function(require,module,exports){
+},{"./tree":24,"aabb-3d":2}],24:[function(require,module,exports){
 module.exports = Tree
 
 var aabb = require('aabb-3d')
@@ -5336,7 +5483,7 @@ proto.send = function(event, bbox, args) {
   }
 }
 
-},{"aabb-3d":2}],24:[function(require,module,exports){
+},{"aabb-3d":2}],25:[function(require,module,exports){
 (function (process){
 
 var window = window || {};
@@ -41370,7 +41517,7 @@ if (typeof exports !== 'undefined') {
 }
 
 }).call(this,require('_process'))
-},{"_process":59}],25:[function(require,module,exports){
+},{"_process":61}],26:[function(require,module,exports){
 (function (process){
 var Stream = require('stream')
 
@@ -41472,7 +41619,7 @@ function through (write, end) {
 
 
 }).call(this,require('_process'))
-},{"_process":59,"stream":71}],26:[function(require,module,exports){
+},{"_process":61,"stream":73}],27:[function(require,module,exports){
 /*
  * tic
  * https://github.com/shama/tic
@@ -41519,7 +41666,7 @@ Tic.prototype.tick = function(dt) {
   });
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var ua = typeof window !== 'undefined' ? window.navigator.userAgent : ''
   , isOSX = /OS X/.test(ua)
   , isOpera = /Opera/.test(ua)
@@ -41657,7 +41804,7 @@ for(i = 112; i < 136; ++i) {
   output[i] = 'F'+(i-111)
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = control
 
 var Stream = require('stream').Stream
@@ -41940,7 +42087,90 @@ function clamp(value, to) {
   return isFinite(to) ? max(min(value, to), -to) : value
 }
 
-},{"stream":71}],29:[function(require,module,exports){
+},{"stream":73}],30:[function(require,module,exports){
+var funstance = require('funstance');
+var EventEmitter = require('events').EventEmitter;
+
+module.exports = function (game, opts) {
+    if (!opts) opts = {};
+    if (!opts.limit) opts.limit = function () { return false };
+    if (opts.yield === undefined) opts.yield = 4;
+    if (typeof opts.yield !== 'function') {
+        opts.yield = (function (y) {
+            return function () { return y };
+        })(opts.yield);
+    }
+    
+    if (!opts.expire) opts.expire = {};
+    if (typeof opts.expire === 'number') {
+        opts.expire = { start : opts.expire, end : opts.expire };
+    }
+    if (!opts.expire.start) opts.expire.start = 15 * 1000;
+    if (!opts.expire.end) opts.expire.end = 30 * 1000;
+    if (!opts.power) opts.power = 1
+    
+    game.on('collision', function (item) {
+        if (!item._debris) return;
+        if (opts.limit && opts.limit(item)) return;
+        
+        game.removeItem(item);
+        item._collected = true;
+        em.emit('collect', item);
+    });
+    
+    var em = new EventEmitter;
+    return funstance(em, function (pos) {
+        var value = game.getBlock(pos);
+        if (value === 0) return;
+        game.setBlock(pos, 0);
+        
+        for (var i = 0; i < opts.yield(value); i++) {
+            var item = createDebris(game, pos, value);
+            item.velocity = {
+                x: (Math.random() * 2 - 1) * 0.05 * opts.power,
+                y: (Math.random() * 2 - 1) * 0.05 * opts.power,
+                z: (Math.random() * 2 - 1) * 0.05 * opts.power
+            };
+            game.addItem(item);
+            
+            var time = opts.expire.start + Math.random()
+                * (opts.expire.end - opts.expire.start);
+            
+            setTimeout(function (item) {
+                game.removeItem(item);
+                if (!item._collected) em.emit('expire', item);
+            }, time, item);
+        }
+    });
+}
+
+function createDebris (game, pos, value) {
+    var mesh = new game.THREE.Mesh(
+        new game.THREE.CubeGeometry(4, 4, 4),
+        game.material
+    );
+    mesh.geometry.faces.forEach(function (face) {
+        face.materialIndex = value - 1
+    });
+    mesh.translateX(pos.x);
+    mesh.translateY(pos.y);
+    mesh.translateZ(pos.z);
+    
+    return {
+        mesh: mesh,
+        size: 4,
+        collisionRadius: 22,
+        value: value,
+        _debris: true,
+        velocity: {
+            x: (Math.random() * 2 - 1) * 0.05,
+            y: (Math.random() * 2 - 1) * 0.05,
+            z: (Math.random() * 2 - 1) * 0.05
+        }
+    };
+}
+
+},{"events":54,"funstance":14}],31:[function(require,module,exports){
 (function (process){
 var voxel = require('voxel')
 var voxelMesh = require('voxel-mesh')
@@ -42530,7 +42760,7 @@ Game.prototype.addMarker = function(position) {
 
 Game.prototype.addAABBMarker = function(aabb, color) {
   var geometry = new THREE.CubeGeometry(aabb.width(), aabb.height(), aabb.depth())
-  var material = new THREE.MeshBasicMaterial({ color: color || 0xffffff, wireframe: true, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
+  var material = new THREE.MeshBasicMaterial({ color: color || 0xffffff, wireframe: true, transparent: true, opacity: 0.05, side: THREE.DoubleSide })
   var mesh = new THREE.Mesh(geometry, material)
   mesh.position.set(aabb.x0() + aabb.width() / 2, aabb.y0() + aabb.height() / 2, aabb.z0() + aabb.depth() / 2)
   this.scene.add(mesh)
@@ -42683,7 +42913,7 @@ Game.prototype.destroy = function() {
 }
 
 }).call(this,require('_process'))
-},{"./lib/detector":30,"./lib/stats":31,"_process":59,"aabb-3d":2,"collide-3d-tilemap":4,"events":52,"gl-matrix":14,"inherits":15,"interact":16,"kb-controls":17,"path":57,"pin-it":19,"raf":21,"spatial-events":22,"three":24,"tic":26,"voxel":34,"voxel-control":28,"voxel-mesh":32,"voxel-physical":40,"voxel-raycast":42,"voxel-region-change":43,"voxel-texture":45,"voxel-view":46}],30:[function(require,module,exports){
+},{"./lib/detector":32,"./lib/stats":33,"_process":61,"aabb-3d":2,"collide-3d-tilemap":4,"events":54,"gl-matrix":15,"inherits":16,"interact":17,"kb-controls":18,"path":59,"pin-it":20,"raf":22,"spatial-events":23,"three":25,"tic":27,"voxel":36,"voxel-control":29,"voxel-mesh":34,"voxel-physical":42,"voxel-raycast":44,"voxel-region-change":45,"voxel-texture":47,"voxel-view":48}],32:[function(require,module,exports){
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mr.doob / http://mrdoob.com/
@@ -42744,7 +42974,7 @@ module.exports = function() {
   };
 }
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -42890,7 +43120,7 @@ var Stats = function () {
 };
 
 module.exports = Stats
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var THREE = require('three')
 
 module.exports = function(data, mesher, scaleFactor, three) {
@@ -43060,7 +43290,7 @@ Mesh.prototype.faceVertexUv = function(i) {
 }
 ;
 
-},{"three":24}],33:[function(require,module,exports){
+},{"three":25}],35:[function(require,module,exports){
 var events = require('events')
 var inherits = require('inherits')
 
@@ -43197,7 +43427,7 @@ Chunker.prototype.voxelVector = function(pos) {
   return [vx, vy, vz]
 };
 
-},{"events":52,"inherits":15}],34:[function(require,module,exports){
+},{"events":54,"inherits":16}],36:[function(require,module,exports){
 var chunker = require('./chunker')
 
 module.exports = function(opts) {
@@ -43293,7 +43523,7 @@ module.exports.generateExamples = function() {
 }
 
 
-},{"./chunker":33,"./meshers/culled":35,"./meshers/greedy":36,"./meshers/monotone":37,"./meshers/stupid":38}],35:[function(require,module,exports){
+},{"./chunker":35,"./meshers/culled":37,"./meshers/greedy":38,"./meshers/monotone":39,"./meshers/stupid":40}],37:[function(require,module,exports){
 //Naive meshing (with face culling)
 function CulledMesh(volume, dims) {
   //Precalculate direction vectors for convenience
@@ -43345,7 +43575,7 @@ if(exports) {
   exports.mesher = CulledMesh;
 }
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var GreedyMesh = (function() {
 //Cache buffer internally
 var mask = new Int32Array(4096);
@@ -43462,7 +43692,7 @@ if(exports) {
   exports.mesher = GreedyMesh;
 }
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 var MonotoneMesh = (function(){
@@ -43715,7 +43945,7 @@ if(exports) {
   exports.mesher = MonotoneMesh;
 }
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 //The stupidest possible way to generate a Minecraft mesh (I think)
 function StupidMesh(volume, dims) {
   var vertices = [], faces = [], x = [0,0,0], n = 0;
@@ -43751,7 +43981,7 @@ if(exports) {
   exports.mesher = StupidMesh;
 }
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var ever = require('ever')
 var vkey = require('vkey')
 var events = require('events')
@@ -43835,7 +44065,7 @@ Fly.prototype.stopFlying = function() {
   physical.subjectTo(game.gravity)
   game.removeListener('tick', physical.onGameTick)
 }
-},{"events":52,"ever":10,"vkey":27}],40:[function(require,module,exports){
+},{"events":54,"ever":10,"vkey":28}],42:[function(require,module,exports){
 module.exports = physical
 
 var aabb = require('aabb-3d')
@@ -44054,7 +44284,7 @@ proto.atRestZ = function() {
   return this.resting.z
 }
 
-},{"aabb-3d":2,"three":24}],41:[function(require,module,exports){
+},{"aabb-3d":2,"three":25}],43:[function(require,module,exports){
 var skin = require('minecraft-skin');
 
 module.exports = function (game) {
@@ -44134,7 +44364,7 @@ function parseXYZ (x, y, z) {
     return { x: Number(x), y: Number(y), z: Number(z) };
 }
 
-},{"minecraft-skin":18}],42:[function(require,module,exports){
+},{"minecraft-skin":19}],44:[function(require,module,exports){
 "use strict"
 
 function traceRay_impl(
@@ -44356,7 +44586,7 @@ function traceRay(voxels, origin, direction, max_d, hit_pos, hit_norm, EPSILON) 
 }
 
 module.exports = traceRay
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 module.exports = coordinates
 
 var aabb = require('aabb-3d')
@@ -44384,238 +44614,388 @@ function coordinates(spatial, box, regionWidth) {
  
   return emitter
 }
-},{"aabb-3d":2,"events":52}],44:[function(require,module,exports){
+},{"aabb-3d":2,"events":54}],46:[function(require,module,exports){
+module.exports = Tetris
 
-module.exports = function(game,opts) {
+function Tetris(game,opts) {
     var updated = {};
     if (!opts) opts = {};
     if (!opts.pos) opts.pos = {
         x:0,
-        y:2,
-        z:3
+        y:0,
+        z:0
     };
     if (!opts.width) opts.width = 6;
     if (!opts.height) opts.height = 20;
     if (!opts.length) opts.length = 6;
     if (!opts.material) opts.material = 1;
-    if (!opts.droprate) opts.droprate = 25;
+    if (!opts.droprate) opts.droprate = 60;
     if (!opts.levels) opts.levels = [1,5,10,25,50,100,200,500,1000,50000];
-    if (!opts.speedincrease) opts.speedincrease = 0;
-    
-    var overflag = false;
-    var voxels = game.voxels;
-    var size = voxels.cubeSize;
-    
-    var pieces = [];
-    var droplocation;
-    var droprate = opts.droprate;
-    var time = 0;
-    var rowsremoved = 0;
-      
-    this.command = function(c,pindex) {
+    if (!opts.speedincrease) opts.speedincrease = 0.2;
+    this.game = game;
+    this.pos = opts.pos
+    this.width = opts.width;
+    this.height = opts.height;
+    this.length = opts.length;
+    this.material = opts.material;
+    this.levels = opts.levels;
+    this.speedincrease = opts.speedincrease;
+    this.overflag = false;
+    this.voxels = this.game.voxels;
+    this.size = this.voxels.cubeSize;
+    this.pieces = [];
+    this.droplocation;
+    this.droprate = opts.droprate;
+    this.timer = 4;
+    this.time = 0;
+    this.rowsremoved = 0;
+    this.corerate = opts.droprate;
+    console.log(this.game.explode)
+
+    var pos = this.pos;
+   for(var i = 0; i < this.width; ++i){
+        for(var j = 0; j < this.length; ++j){
+            this.game.setBlock([pos.x+i, pos.y-1, pos.z+j],1);
+        }
+    }
+
+    if(this.game.getBlock([pos.x, pos.y-1, pos.z])){
+        for(var i = 0; i < this.width; ++i){
+            for(var j = 0; j < this.height; ++j){
+                this.game.addVoxelMarker(pos.x+i, pos.y+j, pos.z-1,0xff0000);
+                this.game.addVoxelMarker(pos.x+i, pos.y+j, pos.z+opts.length,0x00ff00);
+            }
+        }
+
+        for(var i = 0; i < this.length; ++i){
+            for(var j = 0; j < this.height; ++j){
+                this.game.addVoxelMarker(pos.x-1, pos.y+j, pos.z+i,0x0000ff);
+                this.game.addVoxelMarker(pos.x+this.width, pos.y+j, pos.z+i,0xffff00);
+            }
+        }
+
+        for(var i = 0; i < this.width; ++i){
+            for(var j = 0; j < this.length; ++j){
+                this.game.addVoxelMarker(pos.x+i, pos.y+this.height, pos.z+j, 0xFFFFFF);
+            }
+        }
+    }
+//    return this;
+}
+
+
+Tetris.prototype.command = function(c,pindex) {
         if (!pindex) pindex = 0;
         switch(c){
             case 0:
-                spin(pindex,1);
+                this.spin(pindex,1,0);
                 break;
             case 1:
-                spin(pindex,-1);
+                this.spin(pindex,1,1);
                 break;
             case 2:
-                move(pindex,1,0,0);
+                this.spin(pindex,1,2);
                 break;
             case 3:
-                move(pindex,-1,0,0);
+                this.move(pindex,1,0,0);
                 break;
             case 4:
-                moveDown(pindex);
+                this.move(pindex,-1,0,0);
                 break;
             case 5:
-                slam(pindex);
+                this.move(pindex,0,0,1);
+                break;
+            case 6:
+                this.move(pindex,0,0,-1);
+                break;
+            case 7:
+                this.moveDown(pindex);
+                break;
+            case 8:
+                this.slam(pindex);
                 break;
         }
     }
-    this.slam = function(pindex) {
+Tetris.prototype.slam = function(pindex) {
         if (!pindex) pindex = 0;
-        var piece = pieces[pindex];
-        unshow(piece);
+        var piece = this.pieces[pindex];
+        this.unshow(piece);
         do {
             piece.dy -= 1; 
-            reposition(piece);
-        } while (isValid(piece));
+            this.reposition(piece);
+        } while (this.isValid(piece));
         piece.dy += 1;
-        reposition(piece);
-        show(piece);
-        flush();
-        checkRows();
-        pieces.pop();
+        this.reposition(piece);
+        this.show(piece);
+//        flush();
+        this.checkRows();
+        this.pieces.pop();
     }
-    this.moveDown = function(pindex) {
+Tetris.prototype.moveDown = function(pindex) {
         if (!pindex) pindex = 0;
-        move(pindex,0,-1,0,function() {
-            checkRows();
-            pieces.pop();
-        });
+//        this.move(pindex,0,-1,0,function() {
+//            this.checkRows();
+//            this.pieces.pop();
+//        });
+        this.move(pindex,0,-1,0,1);
     }
+
+Tetris.prototype.failop = function(){
+    this.checkRows();
+    this.pieces.pop();
+}
     
-    this.touch = function(pos) {
-        if (pos.y < (opts.pos.y - size)) {
-            command(5);
-            return;
-        }
-        if (pos.y < opts.pos.y) {
-            command(4);
-            return;
-        }
-        if (pos.x > (opts.pos.x + (opts.width*size))) {
-            command(2);
-            return;
-        }
-        if (pos.x < (opts.pos.x)) {
-            command(3);
-            return;
-        }
-        command(0); //no longer turn the other direction.
-    }
-    
-    this.spin = function(pindex, cw, failop) {
-        var piece = pieces[pindex];
-        unshow(piece);
-        piece.spin += cw;
-        reposition(piece);
-        if (!isValid(piece)) {
-            piece.spin -= cw;
-            reposition(piece);
-            show(piece);
-            if (failop) failop();
+Tetris.prototype.spin = function(pindex, cw, axis, failop) {
+        var piece = this.pieces[pindex];
+        this.unshow(piece);
+        piece.spin[axis] += cw;
+        this.reposition(piece);
+        if (!this.isValid(piece)) {
+            piece.spin[axis] -= cw;
+            this.reposition(piece);
+            this.show(piece);
+            if (failop) this.failop();
             return false;
         }
         else {
-            show(piece);
+            this.show(piece);
         }
-        flush();
+//        flush();
         return true;
     }
         
-    this.move = function (pindex, mx, my, mz, failop) {
-        var piece = pieces[pindex];
-        unshow(piece);
+Tetris.prototype.move = function (pindex, mx, my, mz, failop) {
+        var piece = this.pieces[pindex];
+        this.unshow(piece);
         piece.dx += mx;
         piece.dy += my;
         piece.dz += mz;
-        reposition(piece);
-        if (!isValid(piece)) {
+        this.reposition(piece);
+        if (!this.isValid(piece)) {
             piece.dx -= mx;
             piece.dy -= my;
             piece.dz -= mz;    
-            reposition(piece);
-            show(piece);
-            if (failop) failop();
+            this.reposition(piece);
+            this.show(piece);
+            if (failop) this.failop();
             return false;
         }
         else {
-            show(piece);
+            this.show(piece);
         }
-        flush();
+//        flush();
         return true;
     }
     
-    this.removeRow = function(m) {
-        for (var r = 0; r < opts.width; r++) {
-            game.setBlock([opts.pos.x + (r * size), opts.pos.y + (m * size), opts.pos.z],0);
-        }
-        for (var k = m; k < opts.height; k++) {
-            for (var j = 0; j < opts.width; j++) {
-                game.setBlock([opts.pos.x + (j * size), opts.pos.y + (k * size), opts.pos.z],
-                    game.getBlock([opts.pos.x + (j * size), opts.pos.y + ((k+1) * size), opts.pos.z]));
+Tetris.prototype.removeRow = function(m) {
+        for (var i = 0; i < this.length; ++i) {
+            for (var r = 0; r < this.width; ++r) {
+                this.game.explode({x : this.pos.x + (r * this.size), y : this.pos.y + (m * this.size), z : this.pos.z + (i * this.size)});
+                this.game.setBlock([this.pos.x + (r * this.size), this.pos.y + (m * this.size), this.pos.z + (i * this.size)],0);
             }
         }
-        rowsremoved++;
-        checkLevel();
-        flush();
+        for (var k = m; k < this.height; k++) {
+            for (var i = 0; i < this.length; ++i) {
+                for (var j = 0; j < this.width; j++) {
+                    this.game.setBlock([this.pos.x + (j * this.size), this.pos.y + (k * this.size), this.pos.z + (i * this.size)],
+                    this.game.getBlock([this.pos.x + (j * this.size), this.pos.y + ((k+1) * this.size), this.pos.z + (i * this.size)]));
+                }
+            }
+        }
+        ++this.rowsremoved;
+        this.checkLevel();
+//        flush();
     }
-    this.checkLevel  = function() {
-        for (var i = 0; i < opts.levels.length; i++) {
-            if (rowsremoved == opts.levels[i]) {
-                setBoard(i);
-                faster();
+Tetris.prototype.checkLevel  = function() {
+        for (var i = 0; i < this.levels.length; i++) {
+            if (this.rowsremoved == this.levels[i]) {
+//                this.setBoard(i);
+                this.faster();
                 return;
             }
-            if (rowsremoved < opts.levels[i]) {
+            if (this.rowsremoved < this.levels[i]) {
                 return;
             }
         }
     }
-    this.gameOver = function() {
-        clearBoard();
-        resetSpeed();
-        setBoard(opts.material);
-        overflag = true;
-        rowsremoved = 0;
-
+Tetris.prototype.gameOver = function() {
+        this.clearBoard();
+        this.resetSpeed();
+//        this.setBoard(this.material);
+        this.overflag = true;
+        this.rowsremoved = 0;
     }
     
-    this.checkRows = function() {
+Tetris.prototype.checkRows = function() {
         var row;
-        for (var m = 0; m < opts.height;) {
-            console.log("before", m)
+        for (var m = 0; m < this.height;) {
             row = true;
-            for (var n = 0; n < opts.width; n++) {
-
-                    console.log("m :", m, "n :", n, game.getBlock([opts.pos.x + (n * size), opts.pos.y + (m * size), opts.pos.z]))
-                if (!game.getBlock([opts.pos.x + (n * size), opts.pos.y + (m * size), opts.pos.z])) {
-                    row = false;
+            for (var i = 0; i < this.length; ++i){
+                for (var n = 0; n < this.width; n++) {
+                    if (!this.game.getBlock([this.pos.x + (n * this.size), this.pos.y + (m * this.size), this.pos.z + (i * this.size)])) {
+                        row = false;
+                        break;
+                    }
+                }
+                if(!row) {
                     break;
                 }
             }
             if (row) {
-                removeRow(m);
+                this.removeRow(m);
             }
             else {
                 ++m;
             }
         }
     }
-    
-    this.doTick = function() {
-        if ((!pieces) || pieces.length == 0) {
-            makePiece();
-        }
 
-        if (!pieces) return;
-        for (var i = 0; i < pieces.length; i++) {
-            moveDown(i);
+Tetris.prototype.visual = function(timer) {
+        var offset = {
+            x : Math.floor((this.pos.x + this.width)/2),
+            y : Math.floor(this.pos.y + 3),
+            z : Math.floor((this.pos.z + this.length)/2)
+        }
+        if (timer == 4) { // visualize number 3
+            for(var i = 0; i < 3; ++i){
+                this.game.setBlock([offset.x-2+i, offset.y, offset.z], 1);
+                this.game.setBlock([offset.x-2+i, offset.y+3, offset.z], 1);
+                this.game.setBlock([offset.x-2+i, offset.y+6, offset.z], 1);
+            }
+            for(var i = 0; i < 2; ++i){
+                this.game.setBlock([offset.x+1, offset.y+1+i, offset.z],1);
+                this.game.setBlock([offset.x+1, offset.y+4+i, offset.z],1);
+            }
+        }
+        else if (timer == 3) { // visualize number 2
+            for(var i = 0; i < 3; ++i){
+                this.game.setBlock([offset.x-2+i, offset.y, offset.z],0);
+                this.game.setBlock([offset.x-2+i, offset.y+3, offset.z], 0);
+                this.game.setBlock([offset.x-2+i, offset.y+6, offset.z], 0);
+            }
+            for(var i = 0; i < 2; ++i){
+                this.game.setBlock([offset.x+1, offset.y+1+i, offset.z],0);
+                this.game.setBlock([offset.x+1, offset.y+4+i, offset.z],0);
+            }
+
+            for(var i = -2; i < 2; ++i){
+                this.game.setBlock([offset.x + i, offset.y, offset.z],1);
+            }
+            for(var i = -1; i < 1; ++i){
+                this.game.setBlock([offset.x + i, offset.y+3, offset.z],1);
+                this.game.setBlock([offset.x + i, offset.y+6, offset.z],1);
+                this.game.setBlock([offset.x-2, offset.y+2+i, offset.z],1);
+                this.game.setBlock([offset.x+1, offset.y+5+i, offset.z],1);
+            }
+            this.game.setBlock([offset.x-2, offset.y+6, offset.z],1);
+        }
+        else if (timer == 2) { // visualize number 1
+            for(var i = -2; i < 2; ++i){
+                this.game.setBlock([offset.x + i, offset.y, offset.z],0);
+            }
+            for(var i = -1; i < 1; ++i){
+                this.game.setBlock([offset.x + i, offset.y+3, offset.z],0);
+                this.game.setBlock([offset.x + i, offset.y+6, offset.z],0);
+                this.game.setBlock([offset.x-2, offset.y+2+i, offset.z],0);
+                this.game.setBlock([offset.x+1, offset.y+5+i, offset.z],0);
+            }
+            this.game.setBlock([offset.x-2, offset.y+6, offset.z],0);
+
+            for(var i = 0; i < 7; ++i){
+                this.game.setBlock([offset.x, offset.y + i, offset.z],1);
+            }
+            this.game.setBlock([offset.x-1, offset.y + 5, offset.z],1);
+        }
+        else if (timer == 1) { // visualize go
+            for(var i = 0; i < 7; ++i){
+                this.game.setBlock([offset.x, offset.y + i, offset.z],0);
+            }
+            this.game.setBlock([offset.x-1, offset.y + 5, offset.z],0);
+
+            for(var i = 1; i < 6; ++i){
+                this.game.setBlock([offset.x-3, offset.y +i, offset.z],3);
+                this.game.setBlock([offset.x, offset.y +i, offset.z],1);
+                this.game.setBlock([offset.x+2, offset.y +i, offset.z],1);
+            }
+            this.game.setBlock([offset.x-2, offset.y, offset.z],3);
+            this.game.setBlock([offset.x+1, offset.y, offset.z],1);
+            this.game.setBlock([offset.x-2, offset.y+6, offset.z],3);
+            this.game.setBlock([offset.x+1, offset.y+6, offset.z],1);
+            this.game.setBlock([offset.x-1, offset.y+6, offset.z],3);
+            for(var i = 0; i < 3; ++i){
+                this.game.setBlock([offset.x-1, offset.y + i, offset.z],3);
+            }
+            this.game.setBlock([offset.x-2, offset.y+2, offset.z],3);
+        }
+        else if (timer == 0) {
+            for(var i = 1; i < 6; ++i){
+                this.game.setBlock([offset.x-3, offset.y +i, offset.z],0);
+                this.game.setBlock([offset.x, offset.y +i, offset.z],0);
+                this.game.setBlock([offset.x+2, offset.y +i, offset.z],0);
+            }
+            this.game.setBlock([offset.x-2, offset.y, offset.z],0);
+            this.game.setBlock([offset.x+1, offset.y, offset.z],0);
+            this.game.setBlock([offset.x-2, offset.y+6, offset.z],0);
+            this.game.setBlock([offset.x+1, offset.y+6, offset.z],0);
+            this.game.setBlock([offset.x-1, offset.y+6, offset.z],0);
+            for(var i = 0; i < 3; ++i){
+                this.game.setBlock([offset.x-1, offset.y + i, offset.z],0);
+            }
+            this.game.setBlock([offset.x-2, offset.y+2, offset.z],0);
         }
     }
-    this.tick = function () {
-        time++;
-        if (time % droprate == 0) {
-            doTick();
+
+Tetris.prototype.doTick = function() {
+        if (this.timer >= 0) {
+            this.visual(this.timer);
+            --this.timer;
+        }
+            else {
+                if ((!this.pieces) || this.pieces.length == 0) {
+                this.makePiece();
+            }
+
+            if (!this.pieces) return;
+            for (var i = 0; i < this.pieces.length; i++) {
+                this.moveDown(i);
+            }
         }
     }
-    this.faster = function() {
-        droprate = Math.ceil(droprate * (1-opts.speedincrease));
+
+Tetris.prototype.tick = function () {
+        this.time++;
+        if (this.time % this.droprate == 0) {
+            this.doTick();
+            this.time -= this.droprate;
+        }
     }
-    this.slower = function() {
-        droprate = Math.ceil(droprate * (1-opts.speedincrease));
+
+Tetris.prototype.faster = function() {
+        this.droprate = Math.ceil(this.droprate * (1-this.speedincrease));
     }
-    this.resetSpeed = function() {
-        droprate = opts.droprate;
+
+Tetris.prototype.slower = function() {
+        this.droprate = Math.ceil(this.droprate * (1-this.speedincrease));
     }
-    this.clearBoard = function() {
-        var x = opts.pos.x, y = opts.pos.y, z = opts.pos.z;
+
+Tetris.prototype.resetSpeed = function() {
+        this.droprate = this.corerate;
+    }
+
+/*    this.clearBoard = function() {
+        var x = pos.x, y = pos.y, z = pos.z;
         for (var m = 0; m < opts.height+5; m++) {
             for (var n = 0; n < opts.width; n++) {
                 set({
-                    x: x + size*n , 
-                    y: y+size*m, 
+                    x: x + size * n , 
+                    y: y + size * m, 
                     z: z
                 },0);
             }
         }
     }
     this.setBoard = function(material) {
-        var x = opts.pos.x, y = opts.pos.y, z = opts.pos.z;
+        var x = pos.x, y = pos.y, z = pos.z;
         if (!material) material = opts.material;
         
         for (var m = -1; m <= opts.height; m++) {
@@ -44638,25 +45018,24 @@ module.exports = function(game,opts) {
             }, material);
         }
     }
-    
-    this.setDroplocation = function(x,y,z) {
-        droplocation = {
+*/    
+Tetris.prototype.setDroplocation = function(x,y,z) {
+        this.droplocation = {
             x: x, 
             y: y, 
             z: z
         };
     }
-    this.makeBoard = function() {
-        var x = opts.pos.x, y = opts.pos.y, z = opts.pos.z;
-        clearBoard();
-        setBoard(opts.material);
-        setDroplocation(x + (opts.width * size)/2,y + (opts.height * size),z);
-        flush();
+Tetris.prototype.makeBoard = function() {
+//        clearBoard();
+//        setBoard(opts.material);
+        this.setDroplocation(this.pos.x + (this.width * this.size)/2,this.pos.y + (this.height * this.size),this.pos.z + (this.length * this.size)/2);
+//        this.flush();
     }
 
-    this.makePiece = function(pos, type) {
-        if (!pos) pos = droplocation;
-        if (!type) type = Math.floor((Math.random() * 7));
+Tetris.prototype.makePiece = function(pos, type) {
+        if (!pos) pos = this.droplocation;
+        if (!type) type = 8 // Math.floor((Math.random() * 8));
         var piece = [];
         switch (type) {
             case 0: //block
@@ -44671,8 +45050,8 @@ module.exports = function(game,opts) {
                 piece = [{corex: 0, corey: -2, corez: 0}, {corex: 0, corey: -1, corez: 0},{corex: 0, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 0}]
                 break;
 
-            case 3: //Inverted L
-                piece = [{corex: 0, corey: -2, corez: 0}, {corex: 0, corey: -1, corez: 0},{corex: 0, corey: 0, corez: 0},{corex: -1, corey: 0, corez: 0}]
+            case 3: //new
+                piece = [{corex: 0, corey: 1, corez: 0}, {corex: 1, corey: 0, corez: 0},{corex: 0, corey: 0, corez: 0},{corex: 0, corey: 0, corez: 1}]
                 break;
 
             case 4: //T
@@ -44683,82 +45062,101 @@ module.exports = function(game,opts) {
                 piece = [{corex: 0, corey: 1, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: -1, corey: 0, corez: 0},{corex: -1, corey: -1, corez: 0}]
                 break;
 
-            case 6://Inverted S
-                piece = [{corex: 0, corey: 1, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 0},{corex: 1, corey: -1, corez: 0}]
+            case 6: //new 2
+                piece = [{corex: 1, corey: 1, corez: 0}, {corex: 1, corey: 0, corez: 0},{corex: 0, corey: 0, corez: 0},{corex: 0, corey: 0, corez: 1}]
                 break;
-        }
-        piece.material = type % 4 + 3;
+            case 7: // new 3
+                piece = [{corex: 1, corey: 0, corez: 0}, {corex: 0, corey: 0, corez: 0},{corex: 0, corey: 0, corez: 1},{corex: 0, corey: 1, corez: 1}]
+                break;
+            case 8: // debug
+                piece = [{corex: -3, corey: -3, corez: -3},{corex: -3, corey: -3, corez: -2},{corex: -3, corey: -3, corez: -1},{corex: -3, corey: -3, corez: 0},{corex: -3, corey: -3, corez: 1},{corex: -3, corey: -3, corez: 2},{corex: -3, corey: -2, corez: -3},{corex: -3, corey: -2, corez: -2},{corex: -3, corey: -2, corez: -1},{corex: -3, corey: -2, corez: 0},{corex: -3, corey: -2, corez: 1},{corex: -3, corey: -2, corez: 2},{corex: -3, corey: -1, corez: -3},{corex: -3, corey: -1, corez: -2},{corex: -3, corey: -1, corez: -1},{corex: -3, corey: -1, corez: 0},{corex: -3, corey: -1, corez: 1},{corex: -3, corey: -1, corez: 2},{corex: -3, corey: 0, corez: -3},{corex: -3, corey: 0, corez: -2},{corex: -3, corey: 0, corez: -1},{corex: -3, corey: 0, corez: 0},{corex: -3, corey: 0, corez: 1},{corex: -3, corey: 0, corez: 2},{corex: -3, corey: 1, corez: -3},{corex: -3, corey: 1, corez: -2},{corex: -3, corey: 1, corez: -1},{corex: -3, corey: 1, corez: 0},{corex: -3, corey: 1, corez: 1},{corex: -3, corey: 1, corez: 2},{corex: -3, corey: 2, corez: -3},{corex: -3, corey: 2, corez: -2},{corex: -3, corey: 2, corez: -1},{corex: -3, corey: 2, corez: 0},{corex: -3, corey: 2, corez: 1},{corex: -3, corey: 2, corez: 2},{corex: -2, corey: -3, corez: -3},{corex: -2, corey: -3, corez: -2},{corex: -2, corey: -3, corez: -1},{corex: -2, corey: -3, corez: 0},{corex: -2, corey: -3, corez: 1},{corex: -2, corey: -3, corez: 2},{corex: -2, corey: -2, corez: -3},{corex: -2, corey: -2, corez: -2},{corex: -2, corey: -2, corez: -1},{corex: -2, corey: -2, corez: 0},{corex: -2, corey: -2, corez: 1},{corex: -2, corey: -2, corez: 2},{corex: -2, corey: -1, corez: -3},{corex: -2, corey: -1, corez: -2},{corex: -2, corey: -1, corez: -1},{corex: -2, corey: -1, corez: 0},{corex: -2, corey: -1, corez: 1},{corex: -2, corey: -1, corez: 2},{corex: -2, corey: 0, corez: -3},{corex: -2, corey: 0, corez: -2},{corex: -2, corey: 0, corez: -1},{corex: -2, corey: 0, corez: 0},{corex: -2, corey: 0, corez: 1},{corex: -2, corey: 0, corez: 2},{corex: -2, corey: 1, corez: -3},{corex: -2, corey: 1, corez: -2},{corex: -2, corey: 1, corez: -1},{corex: -2, corey: 1, corez: 0},{corex: -2, corey: 1, corez: 1},{corex: -2, corey: 1, corez: 2},{corex: -2, corey: 2, corez: -3},{corex: -2, corey: 2, corez: -2},{corex: -2, corey: 2, corez: -1},{corex: -2, corey: 2, corez: 0},{corex: -2, corey: 2, corez: 1},{corex: -2, corey: 2, corez: 2},{corex: -1, corey: -3, corez: -3},{corex: -1, corey: -3, corez: -2},{corex: -1, corey: -3, corez: -1},{corex: -1, corey: -3, corez: 0},{corex: -1, corey: -3, corez: 1},{corex: -1, corey: -3, corez: 2},{corex: -1, corey: -2, corez: -3},{corex: -1, corey: -2, corez: -2},{corex: -1, corey: -2, corez: -1},{corex: -1, corey: -2, corez: 0},{corex: -1, corey: -2, corez: 1},{corex: -1, corey: -2, corez: 2},{corex: -1, corey: -1, corez: -3},{corex: -1, corey: -1, corez: -2},{corex: -1, corey: -1, corez: -1},{corex: -1, corey: -1, corez: 0},{corex: -1, corey: -1, corez: 1},{corex: -1, corey: -1, corez: 2},{corex: -1, corey: 0, corez: -3},{corex: -1, corey: 0, corez: -2},{corex: -1, corey: 0, corez: -1},{corex: -1, corey: 0, corez: 0},{corex: -1, corey: 0, corez: 1},{corex: -1, corey: 0, corez: 2},{corex: -1, corey: 1, corez: -3},{corex: -1, corey: 1, corez: -2},{corex: -1, corey: 1, corez: -1},{corex: -1, corey: 1, corez: 0},{corex: -1, corey: 1, corez: 1},{corex: -1, corey: 1, corez: 2},{corex: -1, corey: 2, corez: -3},{corex: -1, corey: 2, corez: -2},{corex: -1, corey: 2, corez: -1},{corex: -1, corey: 2, corez: 0},{corex: -1, corey: 2, corez: 1},{corex: -1, corey: 2, corez: 2},{corex: 0, corey: -3, corez: -3},{corex: 0, corey: -3, corez: -2},{corex: 0, corey: -3, corez: -1},{corex: 0, corey: -3, corez: 0},{corex: 0, corey: -3, corez: 1},{corex: 0, corey: -3, corez: 2},{corex: 0, corey: -2, corez: -3},{corex: 0, corey: -2, corez: -2},{corex: 0, corey: -2, corez: -1},{corex: 0, corey: -2, corez: 0},{corex: 0, corey: -2, corez: 1},{corex: 0, corey: -2, corez: 2},{corex: 0, corey: -1, corez: -3},{corex: 0, corey: -1, corez: -2},{corex: 0, corey: -1, corez: -1},{corex: 0, corey: -1, corez: 0},{corex: 0, corey: -1, corez: 1},{corex: 0, corey: -1, corez: 2},{corex: 0, corey: 0, corez: -3},{corex: 0, corey: 0, corez: -2},{corex: 0, corey: 0, corez: -1},{corex: 0, corey: 0, corez: 0},{corex: 0, corey: 0, corez: 1},{corex: 0, corey: 0, corez: 2},{corex: 0, corey: 1, corez: -3},{corex: 0, corey: 1, corez: -2},{corex: 0, corey: 1, corez: -1},{corex: 0, corey: 1, corez: 0},{corex: 0, corey: 1, corez: 1},{corex: 0, corey: 1, corez: 2},{corex: 0, corey: 2, corez: -3},{corex: 0, corey: 2, corez: -2},{corex: 0, corey: 2, corez: -1},{corex: 0, corey: 2, corez: 0},{corex: 0, corey: 2, corez: 1},{corex: 0, corey: 2, corez: 2},{corex: 1, corey: -3, corez: -3},{corex: 1, corey: -3, corez: -2},{corex: 1, corey: -3, corez: -1},{corex: 1, corey: -3, corez: 0},{corex: 1, corey: -3, corez: 1},{corex: 1, corey: -3, corez: 2},{corex: 1, corey: -2, corez: -3},{corex: 1, corey: -2, corez: -2},{corex: 1, corey: -2, corez: -1},{corex: 1, corey: -2, corez: 0},{corex: 1, corey: -2, corez: 1},{corex: 1, corey: -2, corez: 2},{corex: 1, corey: -1, corez: -3},{corex: 1, corey: -1, corez: -2},{corex: 1, corey: -1, corez: -1},{corex: 1, corey: -1, corez: 0},{corex: 1, corey: -1, corez: 1},{corex: 1, corey: -1, corez: 2},{corex: 1, corey: 0, corez: -3},{corex: 1, corey: 0, corez: -2},{corex: 1, corey: 0, corez: -1},{corex: 1, corey: 0, corez: 0},{corex: 1, corey: 0, corez: 1},{corex: 1, corey: 0, corez: 2},{corex: 1, corey: 1, corez: -3},{corex: 1, corey: 1, corez: -2},{corex: 1, corey: 1, corez: -1},{corex: 1, corey: 1, corez: 0},{corex: 1, corey: 1, corez: 1},{corex: 1, corey: 1, corez: 2},{corex: 1, corey: 2, corez: -3},{corex: 1, corey: 2, corez: -2},{corex: 1, corey: 2, corez: -1},{corex: 1, corey: 2, corez: 0},{corex: 1, corey: 2, corez: 1},{corex: 1, corey: 2, corez: 2},{corex: 2, corey: -3, corez: -3},{corex: 2, corey: -3, corez: -2},{corex: 2, corey: -3, corez: -1},{corex: 2, corey: -3, corez: 0},{corex: 2, corey: -3, corez: 1},{corex: 2, corey: -3, corez: 2},{corex: 2, corey: -2, corez: -3},{corex: 2, corey: -2, corez: -2},{corex: 2, corey: -2, corez: -1},{corex: 2, corey: -2, corez: 0},{corex: 2, corey: -2, corez: 1},{corex: 2, corey: -2, corez: 2},{corex: 2, corey: -1, corez: -3},{corex: 2, corey: -1, corez: -2},{corex: 2, corey: -1, corez: -1},{corex: 2, corey: -1, corez: 0},{corex: 2, corey: -1, corez: 1},{corex: 2, corey: -1, corez: 2},{corex: 2, corey: 0, corez: -3},{corex: 2, corey: 0, corez: -2},{corex: 2, corey: 0, corez: -1},{corex: 2, corey: 0, corez: 0},{corex: 2, corey: 0, corez: 1},{corex: 2, corey: 0, corez: 2},{corex: 2, corey: 1, corez: -3},{corex: 2, corey: 1, corez: -2},{corex: 2, corey: 1, corez: -1},{corex: 2, corey: 1, corez: 0},{corex: 2, corey: 1, corez: 1},{corex: 2, corey: 1, corez: 2},{corex: 2, corey: 2, corez: -3},{corex: 2, corey: 2, corez: -2},{corex: 2, corey: 2, corez: -1},{corex: 2, corey: 2, corez: 0},{corex: 2, corey: 2, corez: 1},{corex: 2, corey: 2, corez: 2}]
+            }
+        piece.material = type % 7 + 3;
         piece.initx = pos.x;
         piece.inity = pos.y;
         piece.initz = pos.z;
         piece.dx = 0;
         piece.dy = 0;
         piece.dz = 0;
-        piece.spin = 0;
-        reposition(piece);
-        if (!isValid(piece)) {
-            gameOver();
+        piece.spin = [0, 0, 0];
+        for (var i = 0; i < piece.length; ++i){
+            var block = piece[i];
+            piece[i].spinx = piece[i].corex;
+            piece[i].spiny = piece[i].corey;
+            piece[i].spinz = piece[i].corez;
+        }
+
+        this.reposition(piece);
+        if (!this.isValid(piece)) {
+            this.gameOver();
             return;
         }
-        show(piece);
-        if (!pieces) pieces = [];
-        pieces.push(piece);
-        flush();
+        this.show(piece);
+        if (!this.pieces) this.pieces = [];
+        this.pieces.push(piece);
+//        flush();
     }
     
-    this.reposition = function(piece) {
+Tetris.prototype.reposition = function(piece) {
         for (var i = 0; i < piece.length; i++) {
             var block = piece[i];
-            var nx;
-            var ny;
-            var nz = block.corez;
-            var spin = piece.spin;
-            while (spin < 0) spin+=4;
-            spin %= 4;
-            switch (spin) {
-                case 0:
-                    nx = block.corex;
-                    ny = block.corey;
-                    break;            
-                case 1:
-                    nx = block.corey;
-                    ny = -block.corex;
-                    break;
-                case 2:
-                    nx = -block.corex;
-                    ny = -block.corey;
-                    break;
-                case 3:
-                    nx = -block.corey;
-                    ny = block.corex;
+            var tx = block.spinx;
+            var ty = block.spiny;
+            var tz = block.spinz;
+            if(piece.spin[0] === 1){
+                block.spinx = -ty;
+                block.spiny = tx;
             }
-            block.x = ((nx + piece.dx) * size) + piece.initx;
-            block.y = ((ny + piece.dy) * size) + piece.inity;
-            block.z = ((nz + piece.dz) * size) + piece.initz;
+            else if(piece.spin[0] === -1){
+                block.spinx = ty;
+                block.spiny = -tx;
+            }
+            else if(piece.spin[1] === 1){
+                block.spiny = -tz;
+                block.spinz = ty;
+            }
+            else if(piece.spin[1] === -1){
+                block.spiny = tz;
+                block.spinz = -ty;
+            }
+            else if(piece.spin[2] === 1){
+                block.spinz = -tx;
+                block.spinx = tz;
+            }
+            else if(piece.spin[2] === -1){
+                block.spinz = tx;
+                block.spinx = -tz;
+            }
+            block.x = ((block.spinx + piece.dx) * this.size) + piece.initx;
+            block.y = ((block.spiny + piece.dy) * this.size) + piece.inity;
+            block.z = ((block.spinz + piece.dz) * this.size) + piece.initz;
+        }
+        piece.spin = [0, 0, 0];
+    }
+    
+Tetris.prototype.show = function(piece) {
+        for (var i = 0; i < piece.length; i++) {
+            this.game.setBlock([piece[i].x,piece[i].y,piece[i].z],piece.material);
         }
     }
     
-    var show = function(piece) {
+Tetris.prototype.unshow = function(piece) {
         for (var i = 0; i < piece.length; i++) {
-            game.setBlock([piece[i].x,piece[i].y,piece[i].z],piece.material);
-        }
-    }
-    
-    var unshow = function(piece) {
-        for (var i = 0; i < piece.length; i++) {
-            game.setBlock([piece[i].x,piece[i].y,piece[i].z],0);
+            this.game.setBlock([piece[i].x,piece[i].y,piece[i].z],0);
         }
     }
 
     
-    function isValid(piece) {
+Tetris.prototype.isValid = function(piece) {
         for (var i = 0; i < piece.length; i++) {
-            if (game.getBlock([piece[i].x,piece[i].y,piece[i].z])) return false;
+            if (this.game.getBlock([piece[i].x,piece[i].y,piece[i].z])) return false;
+            if (piece[i].x <= this.pos.x-1 || piece[i].x >= this.pos.x+this.width ||
+                piece[i].z <= this.pos.z-1 || piece[i].z >= this.pos.z+this.length) return false;
         }
         return true;
     }
     
-    function set (posxyz, value) {
+Tetris.prototype.set = function(posxyz, value) {
         voxels.voxelAtPosition(posxyz, value);
         var c = voxels.chunkAtPosition(posxyz);
         var key = c.join('|');
@@ -44767,19 +45165,12 @@ module.exports = function(game,opts) {
         }
     }
     
-    function flush() {
+Tetris.prototype.flush = function() {
         Object.keys(updated).forEach(function (key) {
-            game.showChunk(updated[key]);
+            this.game.showChunk(updated[key]);
         });
     }
-    
-    
-        
-    makeBoard();
-    return this;
-};
-
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 var tic = require('tic')();
 var createAtlas = require('atlaspack');
 
@@ -45166,7 +45557,7 @@ function memoize(func) {
   return memoized;
 }
 
-},{"atlaspack":3,"tic":26}],46:[function(require,module,exports){
+},{"atlaspack":3,"tic":27}],48:[function(require,module,exports){
 (function (process){
 var THREE, temporaryPosition, temporaryVector
 
@@ -45256,7 +45647,7 @@ View.prototype.appendTo = function(element) {
   this.resizeWindow(this.width,this.height)
 }
 }).call(this,require('_process'))
-},{"_process":59}],47:[function(require,module,exports){
+},{"_process":61}],49:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -45372,9 +45763,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -45486,7 +45877,7 @@ exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"buffer":50}],50:[function(require,module,exports){
+},{"buffer":52}],52:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -47279,7 +47670,7 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":47,"ieee754":53,"isarray":56}],51:[function(require,module,exports){
+},{"base64-js":49,"ieee754":55,"isarray":58}],53:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -47390,7 +47781,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":55}],52:[function(require,module,exports){
+},{"../../is-buffer/index.js":57}],54:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -47694,7 +48085,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -47780,7 +48171,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -47805,7 +48196,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -47828,14 +48219,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -48063,7 +48454,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":59}],58:[function(require,module,exports){
+},{"_process":61}],60:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -48110,7 +48501,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":59}],59:[function(require,module,exports){
+},{"_process":61}],61:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -48292,10 +48683,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":61}],61:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":63}],63:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -48371,7 +48762,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":63,"./_stream_writable":65,"core-util-is":51,"inherits":54,"process-nextick-args":58}],62:[function(require,module,exports){
+},{"./_stream_readable":65,"./_stream_writable":67,"core-util-is":53,"inherits":56,"process-nextick-args":60}],64:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -48398,7 +48789,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":64,"core-util-is":51,"inherits":54}],63:[function(require,module,exports){
+},{"./_stream_transform":66,"core-util-is":53,"inherits":56}],65:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -49342,7 +49733,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":61,"./internal/streams/BufferList":66,"_process":59,"buffer":50,"buffer-shims":49,"core-util-is":51,"events":52,"inherits":54,"isarray":56,"process-nextick-args":58,"string_decoder/":72,"util":48}],64:[function(require,module,exports){
+},{"./_stream_duplex":63,"./internal/streams/BufferList":68,"_process":61,"buffer":52,"buffer-shims":51,"core-util-is":53,"events":54,"inherits":56,"isarray":58,"process-nextick-args":60,"string_decoder/":74,"util":50}],66:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -49525,7 +49916,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":61,"core-util-is":51,"inherits":54}],65:[function(require,module,exports){
+},{"./_stream_duplex":63,"core-util-is":53,"inherits":56}],67:[function(require,module,exports){
 (function (process){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
@@ -50082,7 +50473,7 @@ function CorkedRequest(state) {
   };
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":61,"_process":59,"buffer":50,"buffer-shims":49,"core-util-is":51,"events":52,"inherits":54,"process-nextick-args":58,"util-deprecate":73}],66:[function(require,module,exports){
+},{"./_stream_duplex":63,"_process":61,"buffer":52,"buffer-shims":51,"core-util-is":53,"events":54,"inherits":56,"process-nextick-args":60,"util-deprecate":75}],68:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('buffer').Buffer;
@@ -50147,10 +50538,10 @@ BufferList.prototype.concat = function (n) {
   }
   return ret;
 };
-},{"buffer":50,"buffer-shims":49}],67:[function(require,module,exports){
+},{"buffer":52,"buffer-shims":51}],69:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":62}],68:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":64}],70:[function(require,module,exports){
 (function (process){
 var Stream = (function (){
   try {
@@ -50170,13 +50561,13 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":61,"./lib/_stream_passthrough.js":62,"./lib/_stream_readable.js":63,"./lib/_stream_transform.js":64,"./lib/_stream_writable.js":65,"_process":59}],69:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":63,"./lib/_stream_passthrough.js":64,"./lib/_stream_readable.js":65,"./lib/_stream_transform.js":66,"./lib/_stream_writable.js":67,"_process":61}],71:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":64}],70:[function(require,module,exports){
+},{"./lib/_stream_transform.js":66}],72:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":65}],71:[function(require,module,exports){
+},{"./lib/_stream_writable.js":67}],73:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -50305,7 +50696,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":52,"inherits":54,"readable-stream/duplex.js":60,"readable-stream/passthrough.js":67,"readable-stream/readable.js":68,"readable-stream/transform.js":69,"readable-stream/writable.js":70}],72:[function(require,module,exports){
+},{"events":54,"inherits":56,"readable-stream/duplex.js":62,"readable-stream/passthrough.js":69,"readable-stream/readable.js":70,"readable-stream/transform.js":71,"readable-stream/writable.js":72}],74:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -50528,7 +50919,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":50}],73:[function(require,module,exports){
+},{"buffer":52}],75:[function(require,module,exports){
 (function (global){
 
 /**
