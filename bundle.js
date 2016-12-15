@@ -145,10 +145,7 @@ var tetris2 = new tetris(game2, {
 		x:0,
 		y:1,
 		z:3
-	},
-	width: 10,
-	length: 10,
-
+	}
 })
 tetris2.makeBoard();
 
@@ -45035,7 +45032,7 @@ Tetris.prototype.makeBoard = function() {
 
 Tetris.prototype.makePiece = function(pos, type) {
         if (!pos) pos = this.droplocation;
-        if (!type) type = 8 // Math.floor((Math.random() * 8));
+        if (!type) type = Math.floor((Math.random() * 8));
         var piece = [];
         switch (type) {
             case 0: //block
