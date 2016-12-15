@@ -144,10 +144,7 @@ var tetris2 = new tetris(game2, {
 		x:0,
 		y:1,
 		z:3
-	},
-	width: 10,
-	length: 10,
-
+	}
 })
 tetris2.makeBoard();
 
